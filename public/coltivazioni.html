@@ -143,8 +143,8 @@
                     <td>${c.periodo || '-'}</td>
                     <td><span class="badge">${c.stato}</span></td>
                     <td class="actions">
-                        <button class="btn btn-secondary btn-small" onclick="editColtivazione(${c.id})">Modifica</button>
-                        <button class="btn btn-danger btn-small" onclick="deleteColtivazione(${c.id}, '${c.tipo_coltura}')">Elimina</button>
+                        <button class="btn btn-secondary btn-small" onclick="editColtivazione('${c._id}')">Modifica</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteColtivazione('${c._id}', '${c.tipo_coltura}')">Elimina</button>
                     </td>
                 </tr>
             `).join('');

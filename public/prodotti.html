@@ -205,8 +205,8 @@
                         <td>${p.unita_misura}</td>
                         <td class="${statoClass}"><strong>${statoText}</strong></td>
                         <td class="actions">
-                            <button class="btn btn-secondary btn-small" onclick="editProdotto(${p.id})">Modifica</button>
-                            <button class="btn btn-danger btn-small" onclick="deleteProdotto(${p.id}, '${p.nome}')">Elimina</button>
+                            <button class="btn btn-secondary btn-small" onclick="editProdotto('${p._id}')">Modifica</button>
+                            <button class="btn btn-danger btn-small" onclick="deleteProdotto('${p._id}', '${p.nome}')">Elimina</button>
                         </td>
                     </tr>
                 `;

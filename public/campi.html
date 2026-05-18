@@ -126,8 +126,8 @@
                     <td>${campo.tipo_terreno || '-'}</td>
                     <td>${campo.note || '-'}</td>
                     <td class="actions">
-                        <button class="btn btn-secondary btn-small" onclick="editCampo(${campo.id})">Modifica</button>
-                        <button class="btn btn-danger btn-small" onclick="deleteCampo(${campo.id}, '${campo.nome}')">Elimina</button>
+                        <button class="btn btn-secondary btn-small" onclick="editCampo('${campo._id}')">Modifica</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteCampo('${campo._id}', '${campo.nome}')">Elimina</button>
                     </td>
                 </tr>
             `).join('');

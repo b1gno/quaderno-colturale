@@ -191,8 +191,8 @@
                     <td><span class="badge">${a.tipo_attivita || 'Non specificato'}</span></td>
                     <td>${a.descrizione || '-'}</td>
                     <td class="actions">
-                        <button class="btn btn-secondary btn-small" onclick="viewDettagli(${a.id})">Dettagli</button>
-                        <button class="btn btn-danger btn-small" onclick="deleteAttivita(${a.id})">Elimina</button>
+                        <button class="btn btn-secondary btn-small" onclick="viewDettagli('${a._id}')">Dettagli</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteAttivita('${a._id}')">Elimina</button>
                     </td>
                 </tr>
             `).join('');
@@ -256,7 +256,7 @@
                            style="width: 100%; padding: 0.6rem; border: 1px solid #dee2e6; border-radius: 4px;">
                 </div>
                 <div>
-                    <button type="button" class="btn btn-danger btn-small" onclick="removeProdottoRow(${id})">Rimuovi</button>
+                    <button type="button" class="btn btn-danger btn-small" onclick="removeProdottoRow('${id}')">Rimuovi</button>
                 </div>
             `;
             
