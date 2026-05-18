@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Coltivazioni - Quaderno di Campo</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🌾 Quaderno di Campo</h1>
+            <ul class="nav-menu">
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="campi.html">Campi</a></li>
+                <li><a href="coltivazioni.html" class="active">Coltivazioni</a></li>
+                <li><a href="prodotti.html">Magazzino</a></li>
+                <li><a href="attivita.html">Attività</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="margin: 0; border: none; padding: 0;">Gestione Coltivazioni</h2>
+            <button class="btn btn-primary" onclick="openAddColtivazioneModal()">+ Nuova Coltivazione</button>
+        </div>
+        
+        <div class="section">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Campo</th>
+                        <th>Tipo Coltura</th>
+                        <th>Data Semina</th>
+                        <th>Periodo</th>
+                        <th>Stato</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="table-coltivazioni">
+                    <tr>
+                        <td colspan="6" class="loading">Caricamento coltivazioni...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Aggiungi/Modifica Coltivazione -->
+    <div id="modal-coltivazione" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Nuova Coltivazione</h3>
+                <button class="modal-close" onclick="closeModal('modal-coltivazione')">&times;</button>
+            </div>
+            <form id="form-coltivazione" onsubmit="saveColtivazione(event)">
+                <input type="hidden" id="coltivazione-id">
+                
+                <div class="form-group">
+                    <label for="coltivazione-campo">Campo *</label>
+                    <select id="coltivazione-campo" required>
+                        <option value="">Seleziona campo...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="coltivazione-tipo">Tipo di Coltura *</label>
+                    <input type="text" id="coltivazione-tipo" required placeholder="Es: Grano, Mais, Pomodori">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="coltivazione-data">Data Semina</label>
+                        <input type="date" id="coltivazione-data">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="coltivazione-periodo">Periodo</label>
+                        <select id="coltivazione-periodo">
+                            <option value="">Seleziona...</option>
+                            <option value="Primavera-Estate">Primavera-Estate</option>
+                            <option value="Autunno-Inverno">Autunno-Inverno</option>
+                            <option value="Annuale">Annuale</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="coltivazione-stato">Stato</label>
+                    <select id="coltivazione-stato">
+                        <option value="In preparazione">In preparazione</option>
+                        <option value="Seminato">Seminato</option>
+                        <option value="In crescita">In crescita</option>
+                        <option value="In produzione">In produzione</option>
+                        <option value="In raccolta">In raccolta</option>
+                        <option value="Completato">Completato</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-coltivazione')">Annulla</button>
+                    <button type="submit" class="btn btn-primary">Salva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        let coltivazioni = [];
+        let campi = [];
+        let editingId = null;
+
+        async function loadData() {
+            try {
+                [coltivazioni, campi] = await Promise.all([
+                    apiGet('/coltivazioni'),
+                    apiGet('/campi')
+                ]);
+                displayColtivazioni();
+                populateSelect('coltivazione-campo', campi, 'id', 'nome', 'Seleziona campo...');
+            } catch (error) {
+                console.error('Errore:', error);
+                document.getElementById('table-coltivazioni').innerHTML = 
+                    '<tr><td colspan="6" class="text-center text-danger">Errore nel caricamento</td></tr>';
+            }
+        }
+
+        function displayColtivazioni() {
+            const tbody = document.getElementById('table-coltivazioni');
+            
+            if (coltivazioni.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">Nessuna coltivazione registrata</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = coltivazioni.map(c => `
+                <tr>
+                    <td><strong>${c.nome_campo}</strong> (${c.superficie ? formatNumber(c.superficie) + ' ha' : '-'})</td>
+                    <td>${c.tipo_coltura}</td>
+                    <td>${formatDate(c.data_semina)}</td>
+                    <td>${c.periodo || '-'}</td>
+                    <td><span class="badge">${c.stato}</span></td>
+                    <td class="actions">
+                        <button class="btn btn-secondary btn-small" onclick="editColtivazione(${c.id})">Modifica</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteColtivazione(${c.id}, '${c.tipo_coltura}')">Elimina</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddColtivazioneModal() {
+            editingId = null;
+            document.getElementById('modal-title').textContent = 'Nuova Coltivazione';
+            document.getElementById('form-coltivazione').reset();
+            document.getElementById('coltivazione-id').value = '';
+            openModal('modal-coltivazione');
+        }
+
+        async function editColtivazione(id) {
+            try {
+                const coltivazione = await apiGet(`/coltivazioni/${id}`);
+                editingId = id;
+                
+                document.getElementById('modal-title').textContent = 'Modifica Coltivazione';
+                document.getElementById('coltivazione-campo').value = coltivazione.id_campo;
+                document.getElementById('coltivazione-tipo').value = coltivazione.tipo_coltura;
+                document.getElementById('coltivazione-data').value = formatDateForInput(coltivazione.data_semina);
+                document.getElementById('coltivazione-periodo').value = coltivazione.periodo || '';
+                document.getElementById('coltivazione-stato').value = coltivazione.stato;
+                
+                openModal('modal-coltivazione');
+            } catch (error) {
+                showError('Errore nel caricamento della coltivazione');
+            }
+        }
+
+        async function saveColtivazione(event) {
+            event.preventDefault();
+            
+            const data = {
+                id_campo: parseInt(document.getElementById('coltivazione-campo').value),
+                tipo_coltura: document.getElementById('coltivazione-tipo').value,
+                data_semina: document.getElementById('coltivazione-data').value || null,
+                periodo: document.getElementById('coltivazione-periodo').value || null,
+                stato: document.getElementById('coltivazione-stato').value
+            };
+
+            try {
+                if (editingId) {
+                    await apiPut(`/coltivazioni/${editingId}`, data);
+                    showSuccess('Coltivazione aggiornata con successo');
+                } else {
+                    await apiPost('/coltivazioni', data);
+                    showSuccess('Coltivazione creata con successo');
+                }
+                
+                closeModal('modal-coltivazione');
+                loadData();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        async function deleteColtivazione(id, tipo) {
+            if (!confirmAction(`Eliminare la coltivazione "${tipo}"?`)) return;
+
+            try {
+                await apiDelete(`/coltivazioni/${id}`);
+                showSuccess('Coltivazione eliminata');
+                loadData();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>

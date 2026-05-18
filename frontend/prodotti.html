@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Magazzino - Quaderno di Campo</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🌾 Quaderno di Campo</h1>
+            <ul class="nav-menu">
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="campi.html">Campi</a></li>
+                <li><a href="coltivazioni.html">Coltivazioni</a></li>
+                <li><a href="prodotti.html" class="active">Magazzino</a></li>
+                <li><a href="attivita.html">Attività</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="margin: 0; border: none; padding: 0;">Gestione Magazzino</h2>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-secondary" onclick="openCaricoModal()">📦 Carico</button>
+                <button class="btn btn-primary" onclick="openAddProdottoModal()">+ Nuovo Prodotto</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Prodotti in Magazzino</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Prodotto</th>
+                        <th>Categoria</th>
+                        <th>Quantità Disponibile</th>
+                        <th>Scorta Minima</th>
+                        <th>Unità</th>
+                        <th>Stato</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="table-prodotti">
+                    <tr>
+                        <td colspan="7" class="loading">Caricamento prodotti...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>Ultimi Movimenti di Magazzino</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Prodotto</th>
+                        <th>Tipo</th>
+                        <th>Quantità</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody id="table-movimenti">
+                    <tr>
+                        <td colspan="5" class="loading">Caricamento...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Nuovo Prodotto -->
+    <div id="modal-prodotto" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title-prodotto">Nuovo Prodotto</h3>
+                <button class="modal-close" onclick="closeModal('modal-prodotto')">&times;</button>
+            </div>
+            <form id="form-prodotto" onsubmit="saveProdotto(event)">
+                <input type="hidden" id="prodotto-id">
+                
+                <div class="form-group">
+                    <label for="prodotto-nome">Nome Prodotto *</label>
+                    <input type="text" id="prodotto-nome" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="prodotto-categoria">Categoria</label>
+                        <select id="prodotto-categoria">
+                            <option value="altro">Altro</option>
+                            <option value="fitosanitario">Fitosanitario</option>
+                            <option value="concime">Concime</option>
+                            <option value="diserbante">Diserbante</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prodotto-unita">Unità di Misura</label>
+                        <select id="prodotto-unita">
+                            <option value="kg">Kg</option>
+                            <option value="litri">Litri</option>
+                            <option value="quintali">Quintali</option>
+                            <option value="unità">Unità</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="prodotto-quantita">Quantità Iniziale</label>
+                        <input type="number" id="prodotto-quantita" step="0.01" min="0" value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prodotto-scorta">Scorta Minima</label>
+                        <input type="number" id="prodotto-scorta" step="0.01" min="0" value="0">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-prodotto')">Annulla</button>
+                    <button type="submit" class="btn btn-primary">Salva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Carico -->
+    <div id="modal-carico" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Registra Carico Magazzino</h3>
+                <button class="modal-close" onclick="closeModal('modal-carico')">&times;</button>
+            </div>
+            <form id="form-carico" onsubmit="saveCarico(event)">
+                <div class="form-group">
+                    <label for="carico-prodotto">Prodotto *</label>
+                    <select id="carico-prodotto" required>
+                        <option value="">Seleziona prodotto...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="carico-quantita">Quantità da Caricare *</label>
+                    <input type="number" id="carico-quantita" step="0.01" min="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="carico-note">Note</label>
+                    <textarea id="carico-note" rows="3" placeholder="Es: Acquisto da fornitore X"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-carico')">Annulla</button>
+                    <button type="submit" class="btn btn-primary">Registra Carico</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        let prodotti = [];
+        let editingId = null;
+
+        async function loadData() {
+            await Promise.all([loadProdotti(), loadMovimenti()]);
+        }
+
+        async function loadProdotti() {
+            try {
+                prodotti = await apiGet('/prodotti');
+                displayProdotti();
+                populateSelect('carico-prodotto', prodotti, 'id', 'nome', 'Seleziona prodotto...');
+            } catch (error) {
+                console.error('Errore:', error);
+                document.getElementById('table-prodotti').innerHTML = 
+                    '<tr><td colspan="7" class="text-center text-danger">Errore nel caricamento</td></tr>';
+            }
+        }
+
+        function displayProdotti() {
+            const tbody = document.getElementById('table-prodotti');
+            
+            if (prodotti.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Nessun prodotto in magazzino</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = prodotti.map(p => {
+                const isLow = p.quantita_disponibile <= p.scorta_minima;
+                const statoClass = isLow ? 'text-danger' : 'text-success';
+                const statoText = isLow ? '⚠️ Sotto scorta' : '✓ OK';
+                
+                return `
+                    <tr>
+                        <td><strong>${p.nome}</strong></td>
+                        <td>${p.categoria}</td>
+                        <td class="${isLow ? 'text-danger' : ''}"><strong>${formatNumber(p.quantita_disponibile)}</strong></td>
+                        <td>${formatNumber(p.scorta_minima)}</td>
+                        <td>${p.unita_misura}</td>
+                        <td class="${statoClass}"><strong>${statoText}</strong></td>
+                        <td class="actions">
+                            <button class="btn btn-secondary btn-small" onclick="editProdotto(${p.id})">Modifica</button>
+                            <button class="btn btn-danger btn-small" onclick="deleteProdotto(${p.id}, '${p.nome}')">Elimina</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function loadMovimenti() {
+            try {
+                const movimenti = await apiGet('/magazzino/movimenti');
+                displayMovimenti(movimenti.slice(0, 20));
+            } catch (error) {
+                console.error('Errore:', error);
+            }
+        }
+
+        function displayMovimenti(movimenti) {
+            const tbody = document.getElementById('table-movimenti');
+            
+            if (movimenti.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">Nessun movimento registrato</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = movimenti.map(m => `
+                <tr>
+                    <td>${formatDate(m.data)}</td>
+                    <td>${m.nome_prodotto}</td>
+                    <td><span class="badge ${m.tipo_movimento === 'carico' ? '' : 'badge-danger'}">${m.tipo_movimento.toUpperCase()}</span></td>
+                    <td>${formatNumber(m.quantita)} ${m.unita_misura}</td>
+                    <td>${m.note || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddProdottoModal() {
+            editingId = null;
+            document.getElementById('modal-title-prodotto').textContent = 'Nuovo Prodotto';
+            document.getElementById('form-prodotto').reset();
+            openModal('modal-prodotto');
+        }
+
+        async function editProdotto(id) {
+            try {
+                const prodotto = await apiGet(`/prodotti/${id}`);
+                editingId = id;
+                
+                document.getElementById('modal-title-prodotto').textContent = 'Modifica Prodotto';
+                document.getElementById('prodotto-nome').value = prodotto.nome;
+                document.getElementById('prodotto-categoria').value = prodotto.categoria;
+                document.getElementById('prodotto-unita').value = prodotto.unita_misura;
+                document.getElementById('prodotto-quantita').value = prodotto.quantita_disponibile;
+                document.getElementById('prodotto-scorta').value = prodotto.scorta_minima;
+                
+                openModal('modal-prodotto');
+            } catch (error) {
+                showError('Errore nel caricamento del prodotto');
+            }
+        }
+
+        async function saveProdotto(event) {
+            event.preventDefault();
+            
+            const data = {
+                nome: document.getElementById('prodotto-nome').value,
+                categoria: document.getElementById('prodotto-categoria').value,
+                unita_misura: document.getElementById('prodotto-unita').value,
+                quantita_disponibile: parseFloat(document.getElementById('prodotto-quantita').value),
+                scorta_minima: parseFloat(document.getElementById('prodotto-scorta').value)
+            };
+
+            try {
+                if (editingId) {
+                    await apiPut(`/prodotti/${editingId}`, data);
+                    showSuccess('Prodotto aggiornato con successo');
+                } else {
+                    await apiPost('/prodotti', data);
+                    showSuccess('Prodotto creato con successo');
+                }
+                
+                closeModal('modal-prodotto');
+                loadData();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        async function deleteProdotto(id, nome) {
+            if (!confirmAction(`Eliminare il prodotto "${nome}"?`)) return;
+
+            try {
+                await apiDelete(`/prodotti/${id}`);
+                showSuccess('Prodotto eliminato');
+                loadData();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        function openCaricoModal() {
+            document.getElementById('form-carico').reset();
+            openModal('modal-carico');
+        }
+
+        async function saveCarico(event) {
+            event.preventDefault();
+            
+            const data = {
+                id_prodotto: parseInt(document.getElementById('carico-prodotto').value),
+                quantita: parseFloat(document.getElementById('carico-quantita').value),
+                note: document.getElementById('carico-note').value
+            };
+
+            try {
+                await apiPost('/magazzino/carico', data);
+                showSuccess('Carico registrato con successo');
+                closeModal('modal-carico');
+                loadData();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>

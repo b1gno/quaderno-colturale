@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quaderno di Campo Digitale</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🌾 Quaderno di Campo</h1>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="active">Dashboard</a></li>
+                <li><a href="campi.html">Campi</a></li>
+                <li><a href="coltivazioni.html">Coltivazioni</a></li>
+                <li><a href="prodotti.html">Magazzino</a></li>
+                <li><a href="attivita.html">Attività</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <h2>Dashboard</h2>
+        
+        <!-- Statistiche rapide -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Campi Attivi</h3>
+                <p class="stat-number" id="stat-campi">-</p>
+            </div>
+            <div class="stat-card">
+                <h3>Coltivazioni</h3>
+                <p class="stat-number" id="stat-coltivazioni">-</p>
+            </div>
+            <div class="stat-card">
+                <h3>Prodotti in Magazzino</h3>
+                <p class="stat-number" id="stat-prodotti">-</p>
+            </div>
+            <div class="stat-card alert">
+                <h3>⚠️ Sotto Scorta</h3>
+                <p class="stat-number" id="stat-sotto-scorta">-</p>
+            </div>
+        </div>
+
+        <!-- Sezione prodotti sotto scorta -->
+        <div class="section" id="section-sotto-scorta" style="display: none;">
+            <h3>⚠️ Prodotti Sotto Scorta Minima</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Prodotto</th>
+                        <th>Categoria</th>
+                        <th>Disponibile</th>
+                        <th>Scorta Minima</th>
+                        <th>Unità</th>
+                    </tr>
+                </thead>
+                <tbody id="table-sotto-scorta">
+                    <!-- Popolato dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ultime attività -->
+        <div class="section">
+            <h3>📋 Ultime Attività Registrate</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Campo</th>
+                        <th>Tipo</th>
+                        <th>Descrizione</th>
+                    </tr>
+                </thead>
+                <tbody id="table-attivita">
+                    <tr>
+                        <td colspan="4" class="loading">Caricamento...</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center mt-20">
+                <a href="attivita.html" class="btn btn-secondary">Vedi Tutte le Attività</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Carica i dati della dashboard
+        async function loadDashboard() {
+            try {
+                // Carica statistiche
+                const [campi, coltivazioni, prodotti, magazzino] = await Promise.all([
+                    fetch('http://localhost:3000/api/campi').then(r => r.json()),
+                    fetch('http://localhost:3000/api/coltivazioni').then(r => r.json()),
+                    fetch('http://localhost:3000/api/prodotti').then(r => r.json()),
+                    fetch('http://localhost:3000/api/magazzino/statistiche').then(r => r.json())
+                ]);
+
+                document.getElementById('stat-campi').textContent = campi.length;
+                document.getElementById('stat-coltivazioni').textContent = coltivazioni.length;
+                document.getElementById('stat-prodotti').textContent = magazzino.totale_prodotti;
+                document.getElementById('stat-sotto-scorta').textContent = magazzino.prodotti_sotto_scorta;
+
+                // Mostra prodotti sotto scorta se presenti
+                if (magazzino.prodotti_sotto_scorta > 0) {
+                    const prodottiSottoScorta = await fetch('http://localhost:3000/api/prodotti/sotto-scorta').then(r => r.json());
+                    displayProdottiSottoScorta(prodottiSottoScorta);
+                }
+
+                // Carica ultime attività
+                const attivita = await fetch('http://localhost:3000/api/attivita').then(r => r.json());
+                displayUltimeAttivita(attivita.slice(0, 5));
+
+            } catch (error) {
+                console.error('Errore caricamento dashboard:', error);
+                showError('Errore nel caricamento dei dati');
+            }
+        }
+
+        function displayProdottiSottoScorta(prodotti) {
+            const section = document.getElementById('section-sotto-scorta');
+            const tbody = document.getElementById('table-sotto-scorta');
+            
+            if (prodotti.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            tbody.innerHTML = prodotti.map(p => `
+                <tr>
+                    <td><strong>${p.nome}</strong></td>
+                    <td>${p.categoria}</td>
+                    <td class="text-danger"><strong>${p.quantita_disponibile}</strong></td>
+                    <td>${p.scorta_minima}</td>
+                    <td>${p.unita_misura}</td>
+                </tr>
+            `).join('');
+        }
+
+        function displayUltimeAttivita(attivita) {
+            const tbody = document.getElementById('table-attivita');
+            
+            if (attivita.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">Nessuna attività registrata</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = attivita.map(a => `
+                <tr>
+                    <td>${formatDate(a.data)}</td>
+                    <td>${a.nome_campo}</td>
+                    <td><span class="badge">${a.tipo_attivita || 'Non specificato'}</span></td>
+                    <td>${a.descrizione || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Carica dashboard al caricamento pagina
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+</html>
