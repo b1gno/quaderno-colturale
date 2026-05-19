@@ -1,7 +1,10 @@
 const router = require('express').Router();
 const ctrl = require('../controllers/campiController');
 const { validateCampo } = require('../middleware/validate');
+const { auth } = require('../middleware/auth');
 const wrap = require('../middleware/asyncWrapper');
+
+router.use(auth);
 
 router.get('/',                 wrap(ctrl.getAll));
 router.get('/:id',              wrap(ctrl.getById));

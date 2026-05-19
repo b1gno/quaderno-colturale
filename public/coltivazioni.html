@@ -4,80 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestione Coltivazioni - Quaderno di Campo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-    <nav class="navbar">
-        <div class="container">
-            <h1 class="logo">🌾 Quaderno di Campo</h1>
-            <ul class="nav-menu">
-                <li><a href="index.html">Dashboard</a></li>
-                <li><a href="campi.html">Campi</a></li>
-                <li><a href="coltivazioni.html" class="active">Coltivazioni</a></li>
-                <li><a href="prodotti.html">Magazzino</a></li>
-                <li><a href="attivita.html">Attività</a></li>
-            </ul>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen">
+    <nav class="bg-emerald-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl font-bold tracking-tight">🌾 Quaderno di Campo</h1>
+                <ul class="flex gap-1">
+                    <li><a href="index.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Dashboard</a></li>
+                    <li><a href="campi.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Campi</a></li>
+                    <li><a href="coltivazioni.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-white/20 transition-colors">Coltivazioni</a></li>
+                    <li><a href="prodotti.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Magazzino</a></li>
+                    <li><a href="attivita.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Attività</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
 
-    <div class="container main-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h2 style="margin: 0; border: none; padding: 0;">Gestione Coltivazioni</h2>
-            <button class="btn btn-primary" onclick="openAddColtivazioneModal()">+ Nuova Coltivazione</button>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-emerald-700">Gestione Coltivazioni</h2>
+            <button class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg transition-colors shadow-sm" onclick="openAddColtivazioneModal()">+ Nuova Coltivazione</button>
         </div>
-        
-        <div class="section">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Campo</th>
-                        <th>Tipo Coltura</th>
-                        <th>Data Semina</th>
-                        <th>Periodo</th>
-                        <th>Stato</th>
-                        <th>Azioni</th>
-                    </tr>
-                </thead>
-                <tbody id="table-coltivazioni">
-                    <tr>
-                        <td colspan="6" class="loading">Caricamento coltivazioni...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 
-    <!-- Modal Aggiungi/Modifica Coltivazione -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-emerald-600 text-white">
+                            <th class="px-4 py-3 text-left font-semibold">Campo</th>
+                            <th class="px-4 py-3 text-left font-semibold">Tipo Coltura</th>
+                            <th class="px-4 py-3 text-left font-semibold">Data Semina</th>
+                            <th class="px-4 py-3 text-left font-semibold">Periodo</th>
+                            <th class="px-4 py-3 text-left font-semibold">Stato</th>
+                            <th class="px-4 py-3 text-left font-semibold">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-coltivazioni" class="divide-y divide-slate-100">
+                        <tr>
+                            <td colspan="6" class="px-4 py-6 text-center text-slate-400 italic">Caricamento coltivazioni...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
     <div id="modal-coltivazione" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modal-title">Nuova Coltivazione</h3>
-                <button class="modal-close" onclick="closeModal('modal-coltivazione')">&times;</button>
+        <div class="modal-content bg-white rounded-xl shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="modal-title" class="text-lg font-bold text-slate-800">Nuova Coltivazione</h3>
+                <button class="text-slate-400 hover:text-slate-600 text-2xl leading-none transition-colors" onclick="closeModal('modal-coltivazione')">&times;</button>
             </div>
             <form id="form-coltivazione" onsubmit="saveColtivazione(event)">
                 <input type="hidden" id="coltivazione-id">
-                
-                <div class="form-group">
-                    <label for="coltivazione-campo">Campo *</label>
-                    <select id="coltivazione-campo" required>
+
+                <div class="mb-4">
+                    <label for="coltivazione-campo" class="block text-sm font-medium text-slate-700 mb-1">Campo *</label>
+                    <select id="coltivazione-campo" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow bg-white">
                         <option value="">Seleziona campo...</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="coltivazione-tipo">Tipo di Coltura *</label>
-                    <input type="text" id="coltivazione-tipo" required placeholder="Es: Grano, Mais, Pomodori">
+                <div class="mb-4">
+                    <label for="coltivazione-tipo" class="block text-sm font-medium text-slate-700 mb-1">Tipo di Coltura *</label>
+                    <input type="text" id="coltivazione-tipo" required placeholder="Es: Grano, Mais, Pomodori" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="coltivazione-data">Data Semina</label>
-                        <input type="date" id="coltivazione-data">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="coltivazione-data" class="block text-sm font-medium text-slate-700 mb-1">Data Semina</label>
+                        <input type="date" id="coltivazione-data" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
                     </div>
-
-                    <div class="form-group">
-                        <label for="coltivazione-periodo">Periodo</label>
-                        <select id="coltivazione-periodo">
+                    <div>
+                        <label for="coltivazione-periodo" class="block text-sm font-medium text-slate-700 mb-1">Periodo</label>
+                        <select id="coltivazione-periodo" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow bg-white">
                             <option value="">Seleziona...</option>
                             <option value="Primavera-Estate">Primavera-Estate</option>
                             <option value="Autunno-Inverno">Autunno-Inverno</option>
@@ -86,9 +90,9 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="coltivazione-stato">Stato</label>
-                    <select id="coltivazione-stato">
+                <div class="mb-6">
+                    <label for="coltivazione-stato" class="block text-sm font-medium text-slate-700 mb-1">Stato</label>
+                    <select id="coltivazione-stato" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow bg-white">
                         <option value="In preparazione">In preparazione</option>
                         <option value="Seminato">Seminato</option>
                         <option value="In crescita">In crescita</option>
@@ -98,9 +102,9 @@
                     </select>
                 </div>
 
-                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-coltivazione')">Annulla</button>
-                    <button type="submit" class="btn btn-primary">Salva</button>
+                <div class="flex gap-3 justify-end">
+                    <button type="button" class="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors" onclick="closeModal('modal-coltivazione')">Annulla</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-sm">Salva</button>
                 </div>
             </form>
         </div>
@@ -122,29 +126,31 @@
                 populateSelect('coltivazione-campo', campi, '_id', 'nome', 'Seleziona campo...');
             } catch (error) {
                 console.error('Errore:', error);
-                document.getElementById('table-coltivazioni').innerHTML = 
-                    '<tr><td colspan="6" class="text-center text-danger">Errore nel caricamento</td></tr>';
+                document.getElementById('table-coltivazioni').innerHTML =
+                    '<tr><td colspan="6" class="px-4 py-6 text-center text-red-500 font-medium">Errore nel caricamento</td></tr>';
             }
         }
 
         function displayColtivazioni() {
             const tbody = document.getElementById('table-coltivazioni');
-            
+
             if (coltivazioni.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center">Nessuna coltivazione registrata</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-center text-slate-400 italic">Nessuna coltivazione registrata</td></tr>';
                 return;
             }
 
             tbody.innerHTML = coltivazioni.map(c => `
-                <tr>
-                    <td><strong>${c.id_campo?.nome || '-'}</strong> (${c.id_campo?.superficie ? formatNumber(c.id_campo.superficie) + ' ha' : '-'})</td>
-                    <td>${c.tipo_coltura}</td>
-                    <td>${formatDate(c.data_semina)}</td>
-                    <td>${c.periodo || '-'}</td>
-                    <td><span class="badge">${c.stato}</span></td>
-                    <td class="actions">
-                        <button class="btn btn-secondary btn-small" onclick="editColtivazione('${c._id}')">Modifica</button>
-                        <button class="btn btn-danger btn-small" onclick="deleteColtivazione('${c._id}', '${c.tipo_coltura}')">Elimina</button>
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-4 py-3"><span class="font-medium">${c.id_campo?.nome || '-'}</span> ${c.id_campo?.superficie ? '<span class="text-slate-400 text-xs">(' + formatNumber(c.id_campo.superficie) + ' ha)</span>' : ''}</td>
+                    <td class="px-4 py-3 font-medium">${c.tipo_coltura}</td>
+                    <td class="px-4 py-3 text-slate-600">${formatDate(c.data_semina)}</td>
+                    <td class="px-4 py-3">${c.periodo ? '<span class="inline-block bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-1 rounded-full">' + c.periodo + '</span>' : '-'}</td>
+                    <td class="px-4 py-3"><span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-1 rounded-full">${c.stato}</span></td>
+                    <td class="px-4 py-3">
+                        <div class="flex gap-2">
+                            <button class="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline transition-colors" onclick="editColtivazione('${c._id}')">Modifica</button>
+                            <button class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline transition-colors" onclick="deleteColtivazione('${c._id}', '${c.tipo_coltura}')">Elimina</button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
@@ -160,16 +166,16 @@
 
         async function editColtivazione(id) {
             try {
-                const coltivazione = await apiGet(`/coltivazioni/${id}`);
+                const coltivazione = await apiGet('/coltivazioni/' + id);
                 editingId = id;
-                
+
                 document.getElementById('modal-title').textContent = 'Modifica Coltivazione';
                 document.getElementById('coltivazione-campo').value = coltivazione.id_campo;
                 document.getElementById('coltivazione-tipo').value = coltivazione.tipo_coltura;
                 document.getElementById('coltivazione-data').value = formatDateForInput(coltivazione.data_semina);
                 document.getElementById('coltivazione-periodo').value = coltivazione.periodo || '';
                 document.getElementById('coltivazione-stato').value = coltivazione.stato;
-                
+
                 openModal('modal-coltivazione');
             } catch (error) {
                 showError('Errore nel caricamento della coltivazione');
@@ -178,7 +184,7 @@
 
         async function saveColtivazione(event) {
             event.preventDefault();
-            
+
             const data = {
                 id_campo: document.getElementById('coltivazione-campo').value,
                 tipo_coltura: document.getElementById('coltivazione-tipo').value,
@@ -189,13 +195,13 @@
 
             try {
                 if (editingId) {
-                    await apiPut(`/coltivazioni/${editingId}`, data);
+                    await apiPut('/coltivazioni/' + editingId, data);
                     showSuccess('Coltivazione aggiornata con successo');
                 } else {
                     await apiPost('/coltivazioni', data);
                     showSuccess('Coltivazione creata con successo');
                 }
-                
+
                 closeModal('modal-coltivazione');
                 loadData();
             } catch (error) {
@@ -204,10 +210,10 @@
         }
 
         async function deleteColtivazione(id, tipo) {
-            if (!confirmAction(`Eliminare la coltivazione "${tipo}"?`)) return;
+            if (!confirmAction('Eliminare la coltivazione "' + tipo + '"?')) return;
 
             try {
-                await apiDelete(`/coltivazioni/${id}`);
+                await apiDelete('/coltivazioni/' + id);
                 showSuccess('Coltivazione eliminata');
                 loadData();
             } catch (error) {

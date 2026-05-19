@@ -6,6 +6,7 @@ const prodottoUsatoSchema = new mongoose.Schema({
 }, { _id: false });
 
 const attivitaSchema = new mongoose.Schema({
+  id_utente:        { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   data:             { type: Date, required: [true, 'La data è obbligatoria'] },
   id_campo:         { type: mongoose.Schema.Types.ObjectId, ref: 'Campo', required: true },
   id_coltivazione:  { type: mongoose.Schema.Types.ObjectId, ref: 'Coltivazione', default: null },

@@ -1,98 +1,60 @@
-const mongoose = require('mongoose');
-const Prodotto = require('../models/Prodotto');
 const MovimentoMagazzino = require('../models/MovimentoMagazzino');
+const Prodotto = require('../models/Prodotto');
 const AppError = require('../utils/AppError');
 
+const userFilter = (req) => req.user.ruolo === 'admin' ? {} : { id_utente: req.user._id };
+
 exports.getMovimenti = async (req, res) => {
-  const movimenti = await MovimentoMagazzino
-    .find()
+  const movimenti = await MovimentoMagazzino.find(userFilter(req))
     .populate('id_prodotto', 'nome unita_misura')
-    .sort('-createdAt')
-    .limit(100);
+    .sort('-createdAt');
   res.json(movimenti);
 };
 
 exports.getStatistiche = async (req, res) => {
-  const [totali] = await Prodotto.aggregate([
-    {
-      $group: {
-        _id: null,
-        totale_prodotti: { $sum: 1 },
-        prodotti_sotto_scorta: {
-          $sum: { $cond: [{ $lte: ['$quantita_disponibile', '$scorta_minima'] }, 1, 0] }
-        },
-        prodotti_esauriti: {
-          $sum: { $cond: [{ $eq: ['$quantita_disponibile', 0] }, 1, 0] }
-        },
-      }
-    }
-  ]);
+  const prodotti = await Prodotto.find(userFilter(req));
+  const totaleProdotti = prodotti.length;
+  const prodottiSottoScorta = prodotti.filter(p => p.quantita_disponibile <= p.scorta_minima).length;
 
-  const unMeseFa = new Date();
-  unMeseFa.setDate(unMeseFa.getDate() - 30);
-  const movimenti_ultimo_mese = await MovimentoMagazzino.countDocuments({
-    createdAt: { $gte: unMeseFa }
-  });
-
-  res.json({ ...totali, movimenti_ultimo_mese });
+  res.json({ totale_prodotti: totaleProdotti, prodotti_sotto_scorta: prodottiSottoScorta });
 };
 
 exports.carico = async (req, res) => {
-  const { id_prodotto, quantita, note } = req.body;
+  const prodotto = await Prodotto.findOne({ _id: req.body.id_prodotto, ...userFilter(req) });
+  if (!prodotto) throw new AppError('Prodotto non trovato', 404);
 
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  await Prodotto.findByIdAndUpdate(prodotto._id, {
+    $inc: { quantita_disponibile: req.body.quantita }
+  });
 
-  try {
-    const prodotto = await Prodotto.findByIdAndUpdate(
-      id_prodotto,
-      { $inc: { quantita_disponibile: quantita } },
-      { new: true, session }
-    );
-    if (!prodotto) throw new AppError('Prodotto non trovato', 404);
+  const movimento = await MovimentoMagazzino.create({
+    id_utente: req.user._id,
+    id_prodotto: req.body.id_prodotto,
+    tipo_movimento: 'carico',
+    quantita: req.body.quantita,
+    note: req.body.note || ''
+  });
 
-    const [movimento] = await MovimentoMagazzino.create([{
-      id_prodotto, tipo_movimento: 'carico', quantita, note: note || null,
-    }], { session });
-
-    await session.commitTransaction();
-    res.status(201).json({ id: movimento._id, message: 'Carico registrato', prodotto });
-  } catch (err) {
-    await session.abortTransaction();
-    throw err;
-  } finally {
-    session.endSession();
-  }
+  res.status(201).json({ message: 'Carico registrato', movimento });
 };
 
 exports.scarico = async (req, res) => {
-  const { id_prodotto, quantita, note } = req.body;
+  const prodotto = await Prodotto.findOne({ _id: req.body.id_prodotto, ...userFilter(req) });
+  if (!prodotto) throw new AppError('Prodotto non trovato', 404);
+  if (prodotto.quantita_disponibile < req.body.quantita)
+    throw new AppError('Quantità insufficiente', 400);
 
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  await Prodotto.findByIdAndUpdate(prodotto._id, {
+    $inc: { quantita_disponibile: -req.body.quantita }
+  });
 
-  try {
-    const prodotto = await Prodotto.findById(id_prodotto).session(session);
-    if (!prodotto) throw new AppError('Prodotto non trovato', 404);
-    if (prodotto.quantita_disponibile < quantita)
-      throw new AppError(`Quantità insufficiente. Disponibile: ${prodotto.quantita_disponibile}`, 400);
+  const movimento = await MovimentoMagazzino.create({
+    id_utente: req.user._id,
+    id_prodotto: req.body.id_prodotto,
+    tipo_movimento: 'scarico',
+    quantita: req.body.quantita,
+    note: req.body.note || ''
+  });
 
-    await Prodotto.findByIdAndUpdate(
-      id_prodotto,
-      { $inc: { quantita_disponibile: -quantita } },
-      { session }
-    );
-
-    const [movimento] = await MovimentoMagazzino.create([{
-      id_prodotto, tipo_movimento: 'scarico', quantita, note: note || null,
-    }], { session });
-
-    await session.commitTransaction();
-    res.status(201).json({ id: movimento._id, message: 'Scarico registrato' });
-  } catch (err) {
-    await session.abortTransaction();
-    throw err;
-  } finally {
-    session.endSession();
-  }
+  res.status(201).json({ message: 'Scarico registrato', movimento });
 };

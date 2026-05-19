@@ -2,39 +2,37 @@ const Prodotto = require('../models/Prodotto');
 const MovimentoMagazzino = require('../models/MovimentoMagazzino');
 const AppError = require('../utils/AppError');
 
-exports.getAll = async (req, res) => {
-  const prodotti = await Prodotto.find().sort('nome');
-  res.json(prodotti);
-};
+const userFilter = (req) => req.user.ruolo === 'admin' ? {} : { id_utente: req.user._id };
 
-exports.getSottoScorta = async (req, res) => {
-  const prodotti = await Prodotto.find({
-    $expr: { $lte: ['$quantita_disponibile', '$scorta_minima'] }
-  }).sort('nome');
+exports.getAll = async (req, res) => {
+  const prodotti = await Prodotto.find(userFilter(req)).sort('nome');
   res.json(prodotti);
 };
 
 exports.getById = async (req, res) => {
-  const prodotto = await Prodotto.findById(req.params.id);
+  const prodotto = await Prodotto.findOne({ _id: req.params.id, ...userFilter(req) });
   if (!prodotto) throw new AppError('Prodotto non trovato', 404);
   res.json(prodotto);
 };
 
-exports.getMovimenti = async (req, res) => {
-  const movimenti = await MovimentoMagazzino
-    .find({ id_prodotto: req.params.id })
-    .sort('-createdAt');
-  res.json(movimenti);
+exports.getSottoScorta = async (req, res) => {
+  const filter = {
+    ...userFilter(req),
+    $expr: { $lte: ['$quantita_disponibile', '$scorta_minima'] }
+  };
+  const prodotti = await Prodotto.find(filter).sort('nome');
+  res.json(prodotti);
 };
 
 exports.create = async (req, res) => {
-  const prodotto = await Prodotto.create(req.body);
-  res.status(201).json({ id: prodotto._id, message: 'Prodotto creato', prodotto });
+  const prodotto = await Prodotto.create({ ...req.body, id_utente: req.user._id });
+  res.status(201).json({ message: 'Prodotto creato con successo', prodotto });
 };
 
 exports.update = async (req, res) => {
-  const prodotto = await Prodotto.findByIdAndUpdate(
-    req.params.id, req.body,
+  const prodotto = await Prodotto.findOneAndUpdate(
+    { _id: req.params.id, ...userFilter(req) },
+    req.body,
     { new: true, runValidators: true }
   );
   if (!prodotto) throw new AppError('Prodotto non trovato', 404);
@@ -42,7 +40,16 @@ exports.update = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
-  const prodotto = await Prodotto.findByIdAndDelete(req.params.id);
+  const prodotto = await Prodotto.findOneAndDelete({ _id: req.params.id, ...userFilter(req) });
   if (!prodotto) throw new AppError('Prodotto non trovato', 404);
+  await MovimentoMagazzino.deleteMany({ id_prodotto: req.params.id });
   res.json({ message: 'Prodotto eliminato' });
+};
+
+exports.getMovimenti = async (req, res) => {
+  const movimenti = await MovimentoMagazzino.find({
+    id_prodotto: req.params.id,
+    ...userFilter(req)
+  }).populate('id_prodotto', 'nome unita_misura').sort('-createdAt');
+  res.json(movimenti);
 };

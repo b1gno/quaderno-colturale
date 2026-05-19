@@ -4,80 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro Attività - Quaderno di Campo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
     <style>
         .prodotto-row {
             display: grid;
             grid-template-columns: 2fr 1fr auto;
             gap: 1rem;
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 4px;
-        }
-        .prodotti-utilizzati {
-            margin-top: 1rem;
+            margin-bottom: 0.75rem;
+            padding: 0.75rem;
+            background: #f1f5f9;
+            border-radius: 0.5rem;
         }
     </style>
 </head>
-<body>
-    <nav class="navbar">
-        <div class="container">
-            <h1 class="logo">🌾 Quaderno di Campo</h1>
-            <ul class="nav-menu">
-                <li><a href="index.html">Dashboard</a></li>
-                <li><a href="campi.html">Campi</a></li>
-                <li><a href="coltivazioni.html">Coltivazioni</a></li>
-                <li><a href="prodotti.html">Magazzino</a></li>
-                <li><a href="attivita.html" class="active">Attività</a></li>
-            </ul>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen">
+    <nav class="bg-emerald-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl font-bold tracking-tight">🌾 Quaderno di Campo</h1>
+                <ul class="flex gap-1">
+                    <li><a href="index.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Dashboard</a></li>
+                    <li><a href="campi.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Campi</a></li>
+                    <li><a href="coltivazioni.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Coltivazioni</a></li>
+                    <li><a href="prodotti.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Magazzino</a></li>
+                    <li><a href="attivita.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-white/20 transition-colors">Attività</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
 
-    <div class="container main-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h2 style="margin: 0; border: none; padding: 0;">Registro Attività</h2>
-            <button class="btn btn-primary" onclick="openAddAttivitaModal()">+ Nuova Attività</button>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-emerald-700">Registro Attività</h2>
+            <button class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg transition-colors shadow-sm" onclick="openAddAttivitaModal()">+ Nuova Attività</button>
         </div>
-        
-        <div class="section">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Campo</th>
-                        <th>Coltivazione</th>
-                        <th>Tipo Attività</th>
-                        <th>Descrizione</th>
-                        <th>Azioni</th>
-                    </tr>
-                </thead>
-                <tbody id="table-attivita">
-                    <tr>
-                        <td colspan="6" class="loading">Caricamento attività...</td>
-                    </tr>
-                </tbody>
-            </table>
+
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-emerald-600 text-white">
+                            <th class="px-4 py-3 text-left font-semibold">Data</th>
+                            <th class="px-4 py-3 text-left font-semibold">Campo</th>
+                            <th class="px-4 py-3 text-left font-semibold">Coltivazione</th>
+                            <th class="px-4 py-3 text-left font-semibold">Tipo Attività</th>
+                            <th class="px-4 py-3 text-left font-semibold">Descrizione</th>
+                            <th class="px-4 py-3 text-left font-semibold">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-attivita" class="divide-y divide-slate-100">
+                        <tr>
+                            <td colspan="6" class="px-4 py-6 text-center text-slate-400 italic">Caricamento attività...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    </main>
 
     <!-- Modal Nuova Attività -->
     <div id="modal-attivita" class="modal">
-        <div class="modal-content" style="max-width: 800px;">
-            <div class="modal-header">
-                <h3>Nuova Attività</h3>
-                <button class="modal-close" onclick="closeModal('modal-attivita')">&times;</button>
+        <div class="modal-content bg-white rounded-xl shadow-2xl p-6" style="max-width: 700px;">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-slate-800">Nuova Attività</h3>
+                <button class="text-slate-400 hover:text-slate-600 text-2xl leading-none transition-colors" onclick="closeModal('modal-attivita')">&times;</button>
             </div>
             <form id="form-attivita" onsubmit="saveAttivita(event)">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="attivita-data">Data *</label>
-                        <input type="date" id="attivita-data" required>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="attivita-data" class="block text-sm font-medium text-slate-700 mb-1">Data *</label>
+                        <input type="date" id="attivita-data" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
                     </div>
-
-                    <div class="form-group">
-                        <label for="attivita-tipo">Tipo Attività</label>
-                        <select id="attivita-tipo">
+                    <div>
+                        <label for="attivita-tipo" class="block text-sm font-medium text-slate-700 mb-1">Tipo Attività</label>
+                        <select id="attivita-tipo" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow bg-white">
                             <option value="">Seleziona...</option>
                             <option value="Preparazione terreno">Preparazione terreno</option>
                             <option value="Semina">Semina</option>
@@ -92,55 +93,51 @@
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="attivita-campo">Campo *</label>
-                        <select id="attivita-campo" required onchange="loadColtivazioniPerCampo()">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="attivita-campo" class="block text-sm font-medium text-slate-700 mb-1">Campo *</label>
+                        <select id="attivita-campo" required onchange="loadColtivazioniPerCampo()" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow bg-white">
                             <option value="">Seleziona campo...</option>
                         </select>
                     </div>
-
-                    <div class="form-group">
-                        <label for="attivita-coltivazione">Coltivazione</label>
-                        <select id="attivita-coltivazione">
+                    <div>
+                        <label for="attivita-coltivazione" class="block text-sm font-medium text-slate-700 mb-1">Coltivazione</label>
+                        <select id="attivita-coltivazione" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow bg-white">
                             <option value="">Seleziona prima un campo...</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="attivita-descrizione">Descrizione</label>
-                    <textarea id="attivita-descrizione" rows="3" placeholder="Descrivi l'attività svolta..."></textarea>
+                <div class="mb-4">
+                    <label for="attivita-descrizione" class="block text-sm font-medium text-slate-700 mb-1">Descrizione</label>
+                    <textarea id="attivita-descrizione" rows="3" placeholder="Descrivi l'attività svolta..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow resize-y"></textarea>
                 </div>
 
-                <!-- Prodotti utilizzati -->
-                <div class="prodotti-utilizzati">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h4 style="margin: 0;">Prodotti Utilizzati</h4>
-                        <button type="button" class="btn btn-secondary btn-small" onclick="addProdottoRow()">+ Aggiungi Prodotto</button>
+                <div class="mb-2">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-sm font-semibold text-slate-700">Prodotti Utilizzati</h4>
+                        <button type="button" class="text-sm font-medium text-emerald-600 hover:text-emerald-700 border border-emerald-300 hover:bg-emerald-50 px-3 py-1 rounded-lg transition-colors" onclick="addProdottoRow()">+ Aggiungi Prodotto</button>
                     </div>
                     <div id="prodotti-container">
-                        <!-- I prodotti verranno aggiunti qui dinamicamente -->
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-attivita')">Annulla</button>
-                    <button type="submit" class="btn btn-primary">💾 Salva e Scarica da Magazzino</button>
+                <div class="flex gap-3 justify-end mt-6">
+                    <button type="button" class="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors" onclick="closeModal('modal-attivita')">Annulla</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-sm">💾 Salva e Scarica da Magazzino</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal Dettagli Attività -->
+    <!-- Modal Dettagli -->
     <div id="modal-dettagli" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Dettagli Attività</h3>
-                <button class="modal-close" onclick="closeModal('modal-dettagli')">&times;</button>
+        <div class="modal-content bg-white rounded-xl shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-slate-800">Dettagli Attività</h3>
+                <button class="text-slate-400 hover:text-slate-600 text-2xl leading-none transition-colors" onclick="closeModal('modal-dettagli')">&times;</button>
             </div>
-            <div id="dettagli-content">
-                <!-- Popolato dinamicamente -->
+            <div id="dettagli-content" class="text-sm text-slate-700 space-y-2">
             </div>
         </div>
     </div>
@@ -153,7 +150,6 @@
         let prodotti = [];
         let prodottiCounter = 0;
 
-        // Imposta data odierna di default
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('attivita-data').value = today;
@@ -177,22 +173,24 @@
 
         function displayAttivita() {
             const tbody = document.getElementById('table-attivita');
-            
+
             if (attivita.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center">Nessuna attività registrata</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-center text-slate-400 italic">Nessuna attività registrata</td></tr>';
                 return;
             }
 
             tbody.innerHTML = attivita.map(a => `
-                <tr>
-                    <td>${formatDate(a.data)}</td>
-                    <td><strong>${a.id_campo?.nome || '-'}</strong></td>
-                    <td>${a.id_coltivazione?.tipo_coltura || '-'}</td>
-                    <td><span class="badge">${a.tipo_attivita || 'Non specificato'}</span></td>
-                    <td>${a.descrizione || '-'}</td>
-                    <td class="actions">
-                        <button class="btn btn-secondary btn-small" onclick="viewDettagli('${a._id}')">Dettagli</button>
-                        <button class="btn btn-danger btn-small" onclick="deleteAttivita('${a._id}')">Elimina</button>
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-4 py-3">${formatDate(a.data)}</td>
+                    <td class="px-4 py-3 font-medium">${a.id_campo?.nome || '-'}</td>
+                    <td class="px-4 py-3 text-slate-600">${a.id_coltivazione?.tipo_coltura || '-'}</td>
+                    <td class="px-4 py-3"><span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-1 rounded-full">${a.tipo_attivita || 'Non specificato'}</span></td>
+                    <td class="px-4 py-3 text-slate-500 max-w-xs truncate">${a.descrizione || '-'}</td>
+                    <td class="px-4 py-3">
+                        <div class="flex gap-2">
+                            <button class="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline transition-colors" onclick="viewDettagli('${a._id}')">Dettagli</button>
+                            <button class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline transition-colors" onclick="deleteAttivita('${a._id}')">Elimina</button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
@@ -202,30 +200,30 @@
             document.getElementById('form-attivita').reset();
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('attivita-data').value = today;
-            
+
             populateSelect('attivita-campo', campi, '_id', 'nome', 'Seleziona campo...');
             document.getElementById('prodotti-container').innerHTML = '';
             prodottiCounter = 0;
-            
+
             openModal('modal-attivita');
         }
 
         async function loadColtivazioniPerCampo() {
             const campoId = document.getElementById('attivita-campo').value;
             const select = document.getElementById('attivita-coltivazione');
-            
+
             if (!campoId) {
                 select.innerHTML = '<option value="">Seleziona prima un campo...</option>';
                 return;
             }
 
             try {
-                const coltivazioni = await apiGet(`/campi/${campoId}/coltivazioni`);
+                const result = await apiGet('/campi/' + campoId + '/coltivazioni');
                 select.innerHTML = '<option value="">Nessuna coltivazione (opzionale)</option>';
-                coltivazioni.forEach(c => {
+                result.forEach(c => {
                     const option = document.createElement('option');
                     option.value = c._id;
-                    option.textContent = `${c.tipo_coltura} - ${c.stato}`;
+                    option.textContent = c.tipo_coltura + ' - ' + c.stato;
                     select.appendChild(option);
                 });
             } catch (error) {
@@ -236,61 +234,55 @@
         function addProdottoRow() {
             const container = document.getElementById('prodotti-container');
             const id = prodottiCounter++;
-            
+
             const row = document.createElement('div');
             row.className = 'prodotto-row';
-            row.id = `prodotto-row-${id}`;
+            row.id = 'prodotto-row-' + id;
             row.innerHTML = `
                 <div>
-                    <select class="prodotto-select" data-id="${id}" required style="width: 100%; padding: 0.6rem; border: 1px solid #dee2e6; border-radius: 4px;">
+                    <select class="prodotto-select" data-id="${id}" required style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; background: white;">
                         <option value="">Seleziona prodotto...</option>
-                        ${prodotti.map(p => `
-                            <option value="${p._id}" data-disponibile="${p.quantita_disponibile}" data-unita="${p.unita_misura}">
-                                ${p.nome} (Disponibile: ${formatNumber(p.quantita_disponibile)} ${p.unita_misura})
-                            </option>
-                        `).join('')}
+                        ${prodotti.map(p => '<option value="' + p._id + '" data-disponibile="' + p.quantita_disponibile + '" data-unita="' + p.unita_misura + '">' + p.nome + ' (Disponibile: ' + formatNumber(p.quantita_disponibile) + ' ' + p.unita_misura + ')</option>').join('')}
                     </select>
                 </div>
                 <div>
-                    <input type="number" class="prodotto-quantita" data-id="${id}" placeholder="Quantità" step="0.01" min="0.01" required 
-                           style="width: 100%; padding: 0.6rem; border: 1px solid #dee2e6; border-radius: 4px;">
+                    <input type="number" class="prodotto-quantita" data-id="${id}" placeholder="Quantità" step="0.01" min="0.01" required style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem;">
                 </div>
                 <div>
-                    <button type="button" class="btn btn-danger btn-small" onclick="removeProdottoRow('${id}')">Rimuovi</button>
+                    <button type="button" class="text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg transition-colors" onclick="removeProdottoRow('${id}')">Rimuovi</button>
                 </div>
             `;
-            
+
             container.appendChild(row);
         }
 
         function removeProdottoRow(id) {
-            document.getElementById(`prodotto-row-${id}`).remove();
+            document.getElementById('prodotto-row-' + id).remove();
         }
 
         async function saveAttivita(event) {
             event.preventDefault();
-            
-            // Raccogli prodotti utilizzati
+
             const prodottiSelects = document.querySelectorAll('.prodotto-select');
             const prodottiQuantita = document.querySelectorAll('.prodotto-quantita');
-            
+
             const prodottiUtilizzati = [];
             for (let i = 0; i < prodottiSelects.length; i++) {
                 const id_prodotto = prodottiSelects[i].value;
                 const quantita = prodottiQuantita[i].value;
-                
+
                 if (id_prodotto && quantita) {
                     const option = prodottiSelects[i].options[prodottiSelects[i].selectedIndex];
                     const disponibile = parseFloat(option.dataset.disponibile);
                     const quantitaNum = parseFloat(quantita);
-                    
+
                     if (quantitaNum > disponibile) {
-                        showError(`Quantità insufficiente per "${option.text.split(' (')[0]}". Disponibile: ${disponibile}`);
+                        showError('Quantità insufficiente per "' + option.text.split(' (')[0] + '". Disponibile: ' + disponibile);
                         return;
                     }
-                    
+
                     prodottiUtilizzati.push({
-                        id_prodotto,
+                        id_prodotto: id_prodotto,
                         quantita_utilizzata: quantitaNum
                     });
                 }
@@ -307,7 +299,7 @@
 
             try {
                 const result = await apiPost('/attivita', data);
-                showSuccess(`Attività salvata! ${result.prodotti_scaricati} prodotti scaricati dal magazzino.`);
+                showSuccess('Attività salvata! ' + result.prodotti_scaricati + ' prodotti scaricati dal magazzino.');
                 closeModal('modal-attivita');
                 loadData();
             } catch (error) {
@@ -317,26 +309,24 @@
 
         async function viewDettagli(id) {
             try {
-                const attivita = await apiGet(`/attivita/${id}`);
-                
-                let html = `
-                    <p><strong>Data:</strong> ${formatDate(attivita.data)}</p>
-                    <p><strong>Campo:</strong> ${attivita.id_campo?.nome || '-'}</p>
-                    <p><strong>Coltivazione:</strong> ${attivita.id_coltivazione?.tipo_coltura || 'Non specificata'}</p>
-                    <p><strong>Tipo:</strong> ${attivita.tipo_attivita || 'Non specificato'}</p>
-                    <p><strong>Descrizione:</strong> ${attivita.descrizione || 'Nessuna descrizione'}</p>
-                    <hr>
-                    <h4>Prodotti Utilizzati:</h4>
-                `;
+                const a = await apiGet('/attivita/' + id);
 
-                if (attivita.prodotti_usati && attivita.prodotti_usati.length > 0) {
-                    html += '<table class="data-table"><thead><tr><th>Prodotto</th><th>Quantità</th></tr></thead><tbody>';
-                    attivita.prodotti_usati.forEach(p => {
-                        html += `<tr><td>${p.id_prodotto?.nome || '-'}</td><td>${formatNumber(p.quantita_utilizzata)} ${p.id_prodotto?.unita_misura || ''}</td></tr>`;
+                let html = '';
+                html += '<div class="flex justify-between border-b border-slate-200 pb-2"><span class="font-medium text-slate-500">Data:</span><span>' + formatDate(a.data) + '</span></div>';
+                html += '<div class="flex justify-between border-b border-slate-200 pb-2"><span class="font-medium text-slate-500">Campo:</span><span>' + (a.id_campo?.nome || '-') + '</span></div>';
+                html += '<div class="flex justify-between border-b border-slate-200 pb-2"><span class="font-medium text-slate-500">Coltivazione:</span><span>' + (a.id_coltivazione?.tipo_coltura || 'Non specificata') + '</span></div>';
+                html += '<div class="flex justify-between border-b border-slate-200 pb-2"><span class="font-medium text-slate-500">Tipo:</span><span>' + (a.tipo_attivita || 'Non specificato') + '</span></div>';
+                html += '<div class="pb-2"><span class="font-medium text-slate-500">Descrizione:</span><p class="mt-1 text-slate-600">' + (a.descrizione || 'Nessuna descrizione') + '</p></div>';
+
+                if (a.prodotti_usati && a.prodotti_usati.length > 0) {
+                    html += '<h4 class="font-semibold text-slate-700 mt-4 mb-2">Prodotti Utilizzati:</h4>';
+                    html += '<div class="divide-y divide-slate-100 border border-slate-200 rounded-lg overflow-hidden">';
+                    a.prodotti_usati.forEach(p => {
+                        html += '<div class="flex justify-between px-4 py-2 bg-slate-50"><span>' + (p.id_prodotto?.nome || '-') + '</span><span class="font-medium">' + formatNumber(p.quantita_utilizzata) + ' ' + (p.id_prodotto?.unita_misura || '') + '</span></div>';
                     });
-                    html += '</tbody></table>';
+                    html += '</div>';
                 } else {
-                    html += '<p class="text-muted">Nessun prodotto utilizzato</p>';
+                    html += '<p class="text-slate-400 italic mt-3">Nessun prodotto utilizzato</p>';
                 }
 
                 document.getElementById('dettagli-content').innerHTML = html;
@@ -350,7 +340,7 @@
             if (!confirmAction('Eliminare questa attività?\n\nNOTA: I prodotti NON verranno ricaricati automaticamente in magazzino.')) return;
 
             try {
-                await apiDelete(`/attivita/${id}`);
+                await apiDelete('/attivita/' + id);
                 showSuccess('Attività eliminata');
                 loadData();
             } catch (error) {

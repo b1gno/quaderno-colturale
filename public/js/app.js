@@ -3,6 +3,38 @@ const API_URL = window.location.protocol === 'file:'
     ? 'http://localhost:3000/api'
     : '/api';
 
+// Auth helpers
+function getToken() { return localStorage.getItem('token'); }
+
+function getAuthHeaders() {
+  const headers = { 'Content-Type': 'application/json' };
+  const token = getToken();
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  return headers;
+}
+
+function requireAuth() {
+  if (!getToken()) {
+    location.href = 'login.html';
+    return false;
+  }
+  return true;
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  location.href = 'login.html';
+}
+
+function handleAuthError(err) {
+  if (err.message && (err.message.includes('401') || err.message.includes('Accesso negato') || err.message.includes('Token'))) {
+    logout();
+    return;
+  }
+  throw err;
+}
+
 // Utility: Formattazione data
 function formatDate(dateString) {
     if (!dateString) return '-';
@@ -24,24 +56,24 @@ function formatDateForInput(dateString) {
 // Utility: Mostra messaggio di successo
 function showSuccess(message) {
     const alert = document.createElement('div');
-    alert.className = 'alert alert-success';
+    alert.className = 'bg-emerald-100 border border-emerald-300 text-emerald-800 text-sm font-medium px-4 py-3 rounded-lg mb-4 shadow-sm';
     alert.textContent = message;
-    
-    const container = document.querySelector('.main-content');
-    container.insertBefore(alert, container.firstChild);
-    
+
+    const container = document.querySelector('main');
+    if (container) container.insertBefore(alert, container.firstChild);
+
     setTimeout(() => alert.remove(), 3000);
 }
 
 // Utility: Mostra messaggio di errore
 function showError(message) {
     const alert = document.createElement('div');
-    alert.className = 'alert alert-danger';
+    alert.className = 'bg-red-100 border border-red-300 text-red-800 text-sm font-medium px-4 py-3 rounded-lg mb-4 shadow-sm';
     alert.textContent = message;
-    
-    const container = document.querySelector('.main-content');
-    container.insertBefore(alert, container.firstChild);
-    
+
+    const container = document.querySelector('main');
+    if (container) container.insertBefore(alert, container.firstChild);
+
     setTimeout(() => alert.remove(), 5000);
 }
 
@@ -72,16 +104,20 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// API Calls Helper
+// API Calls Helper con auth
 async function apiGet(endpoint) {
     try {
-        const response = await fetch(`${API_URL}${endpoint}`);
+        const response = await fetch(`${API_URL}${endpoint}`, {
+            headers: getAuthHeaders()
+        });
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err.error || `HTTP error! status: ${response.status}`);
         }
         return await response.json();
     } catch (error) {
         console.error('API GET Error:', error);
+        handleAuthError(error);
         throw error;
     }
 }
@@ -90,20 +126,19 @@ async function apiPost(endpoint, data) {
     try {
         const response = await fetch(`${API_URL}${endpoint}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         });
-        
+
         if (!response.ok) {
-            const errorData = await response.json();
+            const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error('API POST Error:', error);
+        handleAuthError(error);
         throw error;
     }
 }
@@ -112,20 +147,19 @@ async function apiPut(endpoint, data) {
     try {
         const response = await fetch(`${API_URL}${endpoint}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         });
-        
+
         if (!response.ok) {
-            const errorData = await response.json();
+            const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error('API PUT Error:', error);
+        handleAuthError(error);
         throw error;
     }
 }
@@ -133,17 +167,19 @@ async function apiPut(endpoint, data) {
 async function apiDelete(endpoint) {
     try {
         const response = await fetch(`${API_URL}${endpoint}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getAuthHeaders()
         });
-        
+
         if (!response.ok) {
-            const errorData = await response.json();
+            const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error('API DELETE Error:', error);
+        handleAuthError(error);
         throw error;
     }
 }
@@ -169,9 +205,9 @@ function validateNumber(value, fieldName) {
 function populateSelect(selectId, items, valueKey, textKey, placeholder = 'Seleziona...') {
     const select = document.getElementById(selectId);
     if (!select) return;
-    
+
     select.innerHTML = `<option value="">${placeholder}</option>`;
-    
+
     items.forEach(item => {
         const option = document.createElement('option');
         option.value = item[valueKey] ?? item._id ?? item.id ?? '';
@@ -186,16 +222,18 @@ function formatNumber(number, decimals = 2) {
     return Number(number).toFixed(decimals);
 }
 
-// Evidenzia menu attivo
+// Protezione pagine + navbar
 document.addEventListener('DOMContentLoaded', () => {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    const navLinks = document.querySelectorAll('.nav-menu a');
-    
-    navLinks.forEach(link => {
-        if (link.getAttribute('href') === currentPage) {
-            link.classList.add('active');
-        } else {
-            link.classList.remove('active');
-        }
-    });
+    // Salta login.html
+    if (!window.location.pathname.includes('login.html')) {
+        if (!requireAuth()) return;
+    }
+
+    // Aggiungi bottone logout alla navbar (se navbar esiste)
+    const nav = document.querySelector('nav ul');
+    if (nav && !document.getElementById('logout-btn')) {
+        const li = document.createElement('li');
+        li.innerHTML = '<a id="logout-btn" href="#" onclick="logout()" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors" style="cursor:pointer" title="Esci">🚪</a>';
+        nav.appendChild(li);
+    }
 });

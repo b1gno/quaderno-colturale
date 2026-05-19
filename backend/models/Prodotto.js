@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const prodottoSchema = new mongoose.Schema({
+  id_utente:            { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   nome:                 { type: String, required: [true, 'Il nome è obbligatorio'], trim: true },
   categoria:            { type: String, default: 'altro',
                           enum: ['fitosanitario','concime','diserbante','altro'] },

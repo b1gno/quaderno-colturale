@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Quaderno di Campo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        if (localStorage.getItem('token')) location.href = 'index.html';
+    </script>
+</head>
+<body class="bg-gradient-to-br from-emerald-600 via-emerald-700 to-green-800 min-h-screen flex items-center justify-center px-4 font-sans">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <div class="text-5xl mb-2">🌾</div>
+            <h1 class="text-3xl font-bold text-white">Quaderno di Campo</h1>
+            <p class="text-emerald-200 text-sm mt-1">Gestisci la tua azienda agricola</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-2xl p-8">
+            <!-- Tab -->
+            <div class="flex mb-6 bg-slate-100 rounded-lg p-1">
+                <button id="tab-login" class="flex-1 py-2 text-sm font-medium rounded-md bg-white shadow-sm transition-all" onclick="showTab('login')">Accedi</button>
+                <button id="tab-register" class="flex-1 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors" onclick="showTab('register')">Registrati</button>
+            </div>
+
+            <!-- Login -->
+            <div id="form-login">
+                <h2 class="text-xl font-bold text-slate-800 mb-1">Bentornato</h2>
+                <p class="text-sm text-slate-500 mb-6">Accedi al tuo account</p>
+                <form onsubmit="handleLogin(event)">
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                        <input type="email" id="login-email" required placeholder="mario@example.com"
+                            class="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
+                    </div>
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                        <input type="password" id="login-password" required placeholder="••••••••"
+                            class="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
+                    </div>
+                    <div id="login-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4"></div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors shadow-sm">Accedi</button>
+                </form>
+            </div>
+
+            <!-- Register -->
+            <div id="form-register" class="hidden">
+                <h2 class="text-xl font-bold text-slate-800 mb-1">Crea Account</h2>
+                <p class="text-sm text-slate-500 mb-6">Registrati per iniziare</p>
+                <form onsubmit="handleRegister(event)">
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Nome e Cognome</label>
+                        <input type="text" id="reg-nome" required placeholder="Mario Rossi"
+                            class="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                        <input type="email" id="reg-email" required placeholder="mario@example.com"
+                            class="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
+                    </div>
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                        <input type="password" id="reg-password" required placeholder="Minimo 6 caratteri" minlength="6"
+                            class="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
+                    </div>
+                    <div id="register-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4"></div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors shadow-sm">Registrati</button>
+                </form>
+            </div>
+        </div>
+        <p class="text-center text-emerald-200/60 text-xs mt-6">Quaderno di Campo Digitale</p>
+    </div>
+
+    <script>
+        function showTab(tab) {
+            document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('form-register').classList.toggle('hidden', tab !== 'register');
+            document.getElementById('tab-login').className = 'flex-1 py-2 text-sm font-medium rounded-md' + (tab === 'login' ? ' bg-white shadow-sm' : ' text-slate-500 hover:text-slate-700') + ' transition-all';
+            document.getElementById('tab-register').className = 'flex-1 py-2 text-sm font-medium rounded-md' + (tab === 'register' ? ' bg-white shadow-sm' : ' text-slate-500 hover:text-slate-700') + ' transition-all';
+        }
+
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            el.textContent = msg;
+            el.classList.remove('hidden');
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            document.getElementById('login-error').classList.add('hidden');
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: document.getElementById('login-email').value, password: document.getElementById('login-password').value })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                location.href = 'index.html';
+            } catch (err) {
+                showError('login-error', err.message || 'Errore');
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            document.getElementById('register-error').classList.add('hidden');
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nome: document.getElementById('reg-nome').value,
+                        email: document.getElementById('reg-email').value,
+                        password: document.getElementById('reg-password').value
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                location.href = 'index.html';
+            } catch (err) {
+                showError('register-error', err.message || 'Errore');
+            }
+        }
+    </script>
+</body>
+</html>

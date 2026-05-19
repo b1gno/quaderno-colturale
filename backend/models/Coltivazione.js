@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const coltivazioneSchema = new mongoose.Schema({
+  id_utente:    { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   id_campo:     { type: mongoose.Schema.Types.ObjectId, ref: 'Campo', required: true },
   tipo_coltura: { type: String, required: [true, 'Il tipo di coltura è obbligatorio'], trim: true },
   data_semina:  Date,

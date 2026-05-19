@@ -1,34 +1,31 @@
 const Coltivazione = require('../models/Coltivazione');
-const Campo = require('../models/Campo');
 const AppError = require('../utils/AppError');
 
+const userFilter = (req) => req.user.ruolo === 'admin' ? {} : { id_utente: req.user._id };
+
 exports.getAll = async (req, res) => {
-  const coltivazioni = await Coltivazione
-    .find()
+  const coltivazioni = await Coltivazione.find(userFilter(req))
     .populate('id_campo', 'nome superficie')
     .sort('-data_semina');
   res.json(coltivazioni);
 };
 
 exports.getById = async (req, res) => {
-  const coltivazione = await Coltivazione
-    .findById(req.params.id)
+  const coltivazione = await Coltivazione.findOne({ _id: req.params.id, ...userFilter(req) })
     .populate('id_campo', 'nome superficie');
   if (!coltivazione) throw new AppError('Coltivazione non trovata', 404);
   res.json(coltivazione);
 };
 
 exports.create = async (req, res) => {
-  const campo = await Campo.findById(req.body.id_campo);
-  if (!campo) throw new AppError('Campo non trovato', 404);
-
-  const coltivazione = await Coltivazione.create(req.body);
-  res.status(201).json({ id: coltivazione._id, message: 'Coltivazione creata', coltivazione });
+  const coltivazione = await Coltivazione.create({ ...req.body, id_utente: req.user._id });
+  res.status(201).json({ message: 'Coltivazione creata con successo', coltivazione });
 };
 
 exports.update = async (req, res) => {
-  const coltivazione = await Coltivazione.findByIdAndUpdate(
-    req.params.id, req.body,
+  const coltivazione = await Coltivazione.findOneAndUpdate(
+    { _id: req.params.id, ...userFilter(req) },
+    req.body,
     { new: true, runValidators: true }
   );
   if (!coltivazione) throw new AppError('Coltivazione non trovata', 404);
@@ -36,7 +33,7 @@ exports.update = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
-  const coltivazione = await Coltivazione.findByIdAndDelete(req.params.id);
+  const coltivazione = await Coltivazione.findOneAndDelete({ _id: req.params.id, ...userFilter(req) });
   if (!coltivazione) throw new AppError('Coltivazione non trovata', 404);
   res.json({ message: 'Coltivazione eliminata' });
 };
