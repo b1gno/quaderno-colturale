@@ -1,5 +1,7 @@
 // Configurazione API
-const API_URL = '/api';
+const API_URL = window.location.protocol === 'file:'
+    ? 'http://localhost:3000/api'
+    : '/api';
 
 // Utility: Formattazione data
 function formatDate(dateString) {

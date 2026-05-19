@@ -33,6 +33,8 @@ MONGODB_URI=mongodb://localhost:27017/quaderno_campo
 PORT=3000
 ```
 
+Se non hai ancora un file `.env`, copia `backend/.env.example` e modificane i valori.
+
 > Se usi MongoDB Atlas, sostituisci `MONGODB_URI` con la stringa di connessione fornita da Atlas.
 
 ## ▶️ Avvio dell'applicazione
