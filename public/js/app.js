@@ -1,5 +1,5 @@
 // Configurazione API
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 
 // Utility: Formattazione data
 function formatDate(dateString) {
@@ -172,8 +172,8 @@ function populateSelect(selectId, items, valueKey, textKey, placeholder = 'Selez
     
     items.forEach(item => {
         const option = document.createElement('option');
-        option.value = item[valueKey];
-        option.textContent = item[textKey];
+        option.value = item[valueKey] ?? item._id ?? item.id ?? '';
+        option.textContent = item[textKey] ?? '';
         select.appendChild(option);
     });
 }

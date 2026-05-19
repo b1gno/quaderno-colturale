@@ -93,10 +93,10 @@
             try {
                 // Carica statistiche
                 const [campi, coltivazioni, prodotti, magazzino] = await Promise.all([
-                    fetch('http://localhost:3000/api/campi').then(r => r.json()),
-                    fetch('http://localhost:3000/api/coltivazioni').then(r => r.json()),
-                    fetch('http://localhost:3000/api/prodotti').then(r => r.json()),
-                    fetch('http://localhost:3000/api/magazzino/statistiche').then(r => r.json())
+                    apiGet('/campi'),
+                    apiGet('/coltivazioni'),
+                    apiGet('/prodotti'),
+                    apiGet('/magazzino/statistiche')
                 ]);
 
                 document.getElementById('stat-campi').textContent = campi.length;
@@ -106,12 +106,12 @@
 
                 // Mostra prodotti sotto scorta se presenti
                 if (magazzino.prodotti_sotto_scorta > 0) {
-                    const prodottiSottoScorta = await fetch('http://localhost:3000/api/prodotti/sotto-scorta').then(r => r.json());
+                    const prodottiSottoScorta = await apiGet('/prodotti/sotto-scorta');
                     displayProdottiSottoScorta(prodottiSottoScorta);
                 }
 
                 // Carica ultime attività
-                const attivita = await fetch('http://localhost:3000/api/attivita').then(r => r.json());
+                const attivita = await apiGet('/attivita');
                 displayUltimeAttivita(attivita.slice(0, 5));
 
             } catch (error) {
@@ -152,7 +152,7 @@
             tbody.innerHTML = attivita.map(a => `
                 <tr>
                     <td>${formatDate(a.data)}</td>
-                    <td>${a.nome_campo}</td>
+                    <td>${a.id_campo?.nome || '-'}</td>
                     <td><span class="badge">${a.tipo_attivita || 'Non specificato'}</span></td>
                     <td>${a.descrizione || '-'}</td>
                 </tr>

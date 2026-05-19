@@ -186,8 +186,8 @@
             tbody.innerHTML = attivita.map(a => `
                 <tr>
                     <td>${formatDate(a.data)}</td>
-                    <td><strong>${a.nome_campo}</strong></td>
-                    <td>${a.tipo_coltura || '-'}</td>
+                    <td><strong>${a.id_campo?.nome || '-'}</strong></td>
+                    <td>${a.id_coltivazione?.tipo_coltura || '-'}</td>
                     <td><span class="badge">${a.tipo_attivita || 'Non specificato'}</span></td>
                     <td>${a.descrizione || '-'}</td>
                     <td class="actions">
@@ -203,7 +203,7 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('attivita-data').value = today;
             
-            populateSelect('attivita-campo', campi, 'id', 'nome', 'Seleziona campo...');
+            populateSelect('attivita-campo', campi, '_id', 'nome', 'Seleziona campo...');
             document.getElementById('prodotti-container').innerHTML = '';
             prodottiCounter = 0;
             
@@ -224,7 +224,7 @@
                 select.innerHTML = '<option value="">Nessuna coltivazione (opzionale)</option>';
                 coltivazioni.forEach(c => {
                     const option = document.createElement('option');
-                    option.value = c.id;
+                    option.value = c._id;
                     option.textContent = `${c.tipo_coltura} - ${c.stato}`;
                     select.appendChild(option);
                 });
@@ -245,7 +245,7 @@
                     <select class="prodotto-select" data-id="${id}" required style="width: 100%; padding: 0.6rem; border: 1px solid #dee2e6; border-radius: 4px;">
                         <option value="">Seleziona prodotto...</option>
                         ${prodotti.map(p => `
-                            <option value="${p.id}" data-disponibile="${p.quantita_disponibile}" data-unita="${p.unita_misura}">
+                            <option value="${p._id}" data-disponibile="${p.quantita_disponibile}" data-unita="${p.unita_misura}">
                                 ${p.nome} (Disponibile: ${formatNumber(p.quantita_disponibile)} ${p.unita_misura})
                             </option>
                         `).join('')}
@@ -290,7 +290,7 @@
                     }
                     
                     prodottiUtilizzati.push({
-                        id_prodotto: parseInt(id_prodotto),
+                        id_prodotto,
                         quantita_utilizzata: quantitaNum
                     });
                 }
@@ -298,7 +298,7 @@
 
             const data = {
                 data: document.getElementById('attivita-data').value,
-                id_campo: parseInt(document.getElementById('attivita-campo').value),
+                id_campo: document.getElementById('attivita-campo').value,
                 id_coltivazione: document.getElementById('attivita-coltivazione').value || null,
                 tipo_attivita: document.getElementById('attivita-tipo').value || null,
                 descrizione: document.getElementById('attivita-descrizione').value || null,
@@ -321,18 +321,18 @@
                 
                 let html = `
                     <p><strong>Data:</strong> ${formatDate(attivita.data)}</p>
-                    <p><strong>Campo:</strong> ${attivita.nome_campo}</p>
-                    <p><strong>Coltivazione:</strong> ${attivita.tipo_coltura || 'Non specificata'}</p>
+                    <p><strong>Campo:</strong> ${attivita.id_campo?.nome || '-'}</p>
+                    <p><strong>Coltivazione:</strong> ${attivita.id_coltivazione?.tipo_coltura || 'Non specificata'}</p>
                     <p><strong>Tipo:</strong> ${attivita.tipo_attivita || 'Non specificato'}</p>
                     <p><strong>Descrizione:</strong> ${attivita.descrizione || 'Nessuna descrizione'}</p>
                     <hr>
                     <h4>Prodotti Utilizzati:</h4>
                 `;
 
-                if (attivita.prodotti_utilizzati && attivita.prodotti_utilizzati.length > 0) {
+                if (attivita.prodotti_usati && attivita.prodotti_usati.length > 0) {
                     html += '<table class="data-table"><thead><tr><th>Prodotto</th><th>Quantità</th></tr></thead><tbody>';
-                    attivita.prodotti_utilizzati.forEach(p => {
-                        html += `<tr><td>${p.nome_prodotto}</td><td>${formatNumber(p.quantita_utilizzata)} ${p.unita_misura}</td></tr>`;
+                    attivita.prodotti_usati.forEach(p => {
+                        html += `<tr><td>${p.id_prodotto?.nome || '-'}</td><td>${formatNumber(p.quantita_utilizzata)} ${p.id_prodotto?.unita_misura || ''}</td></tr>`;
                     });
                     html += '</tbody></table>';
                 } else {

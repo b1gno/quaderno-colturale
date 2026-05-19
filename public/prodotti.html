@@ -175,7 +175,7 @@
             try {
                 prodotti = await apiGet('/prodotti');
                 displayProdotti();
-                populateSelect('carico-prodotto', prodotti, 'id', 'nome', 'Seleziona prodotto...');
+                populateSelect('carico-prodotto', prodotti, '_id', 'nome', 'Seleziona prodotto...');
             } catch (error) {
                 console.error('Errore:', error);
                 document.getElementById('table-prodotti').innerHTML = 
@@ -230,15 +230,18 @@
                 return;
             }
 
-            tbody.innerHTML = movimenti.map(m => `
+            tbody.innerHTML = movimenti.map(m => {
+                const prodotto = m.id_prodotto || {};
+                return `
                 <tr>
                     <td>${formatDate(m.data)}</td>
-                    <td>${m.nome_prodotto}</td>
+                    <td>${prodotto.nome || m.nome_prodotto || '-'}</td>
                     <td><span class="badge ${m.tipo_movimento === 'carico' ? '' : 'badge-danger'}">${m.tipo_movimento.toUpperCase()}</span></td>
-                    <td>${formatNumber(m.quantita)} ${m.unita_misura}</td>
+                    <td>${formatNumber(m.quantita)} ${prodotto.unita_misura || m.unita_misura || ''}</td>
                     <td>${m.note || '-'}</td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function openAddProdottoModal() {
@@ -314,7 +317,7 @@
             event.preventDefault();
             
             const data = {
-                id_prodotto: parseInt(document.getElementById('carico-prodotto').value),
+                id_prodotto: document.getElementById('carico-prodotto').value,
                 quantita: parseFloat(document.getElementById('carico-quantita').value),
                 note: document.getElementById('carico-note').value
             };

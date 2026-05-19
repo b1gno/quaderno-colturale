@@ -1,27 +1,19 @@
-<<<<<<< HEAD
-# Quaderno-Colturale
-=======
 # Quaderno di Campo Digitale
 
 Applicazione web per la gestione di un quaderno di campo digitale con sistema integrato di gestione magazzino.
 
 ## 📋 Requisiti
 
-- **XAMPP** (per MySQL e Apache)
 - **Node.js** (versione 14 o superiore)
 - **npm** (incluso con Node.js)
+- **MongoDB** (locale o Atlas)
 
 ## 🚀 Installazione
 
 ### 1. Setup Database
 
-1. Avvia **XAMPP Control Panel**
-2. Avvia i servizi **Apache** e **MySQL**
-3. Apri **phpMyAdmin** (http://localhost/phpmyadmin)
-4. Vai su **Importa** → Seleziona il file `quaderno_campo.sql`
-5. Clicca su **Esegui**
-
-Il database verrà creato automaticamente con dati di esempio.
+1. Avvia MongoDB localmente o crea un cluster su MongoDB Atlas.
+2. Crea un database `quaderno_campo` se necessario.
 
 ### 2. Setup Backend
 
@@ -37,14 +29,11 @@ npm install
 Verifica che il file `backend/.env` contenga:
 
 ```
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=
-DB_NAME=quaderno_campo
+MONGODB_URI=mongodb://localhost:27017/quaderno_campo
 PORT=3000
 ```
 
-**IMPORTANTE**: Se la tua installazione di MySQL ha una password, modificala nel file `.env`.
+> Se usi MongoDB Atlas, sostituisci `MONGODB_URI` con la stringa di connessione fornita da Atlas.
 
 ## ▶️ Avvio dell'applicazione
 
@@ -69,7 +58,21 @@ Il server sarà disponibile su: **http://localhost:3000**
 Apri il browser e vai su:
 - **http://localhost:3000** (Dashboard principale)
 
-## 📁 Struttura del Progetto
+## � Deploy su Vercel
+
+Il progetto è pronto per essere distribuito su Vercel.
+
+1. Crea una nuova applicazione su Vercel usando la cartella principale del repository.
+2. Aggiungi la variabile ambiente `MONGODB_URI` nelle impostazioni del progetto.
+3. Usa i seguenti file già presenti nel repository:
+   - `vercel.json`
+   - `api/index.js`
+   - `public/` per il frontend statico
+4. Non è necessario specificare un build step, Vercel utilizzerà automaticamente `api/index.js` come funzione serverless.
+
+> Il frontend usa l'API relativa `/api`, quindi il deploy su Vercel può servire correttamente le chiamate alle rotte API.
+
+## �📁 Struttura del Progetto
 
 ```
 quaderno-campo/
@@ -86,7 +89,7 @@ quaderno-campo/
 │   ├── server.js              # Server principale
 │   └── package.json
 │
-├── frontend/
+├── public/
 │   ├── css/
 │   │   └── style.css          # Stili dell'applicazione
 │   ├── js/
@@ -97,7 +100,7 @@ quaderno-campo/
 │   ├── prodotti.html          # Gestione magazzino
 │   └── attivita.html          # Registro attività
 │
-├── quaderno_campo.sql         # File SQL per il database
+├── quaderno_campo.sql         # File SQL legacy, non usato dal backend MongoDB
 └── README.md
 ```
 
@@ -214,9 +217,8 @@ Puoi eliminarli o modificarli dalla dashboard.
 ## 👨‍💻 Autore
 
 Progetto di approfondimento - Classe Quinta
-Tecnologie utilizzate: Node.js, Express, MySQL, HTML/CSS/JavaScript
+Tecnologie utilizzate: Node.js, Express, MongoDB, HTML/CSS/JavaScript
 
 ## 📝 Licenza
 
 Progetto didattico per scopi educativi.
->>>>>>> master

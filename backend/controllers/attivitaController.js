@@ -77,6 +77,24 @@ exports.create = async (req, res) => {
   }
 };
 
+exports.getByCampo = async (req, res) => {
+  const attivita = await Attivita.find({ id_campo: req.params.id })
+    .populate('id_campo', 'nome')
+    .populate('id_coltivazione', 'tipo_coltura stato')
+    .sort('-data');
+  res.json(attivita);
+};
+
+exports.update = async (req, res) => {
+  const attivita = await Attivita.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true, runValidators: true }
+  );
+  if (!attivita) throw new AppError('Attività non trovata', 404);
+  res.json({ message: 'Attività aggiornata', attivita });
+};
+
 exports.delete = async (req, res) => {
   const attivita = await Attivita.findByIdAndDelete(req.params.id);
   if (!attivita) throw new AppError('Attività non trovata', 404);

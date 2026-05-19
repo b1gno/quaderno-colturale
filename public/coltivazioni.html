@@ -119,7 +119,7 @@
                     apiGet('/campi')
                 ]);
                 displayColtivazioni();
-                populateSelect('coltivazione-campo', campi, 'id', 'nome', 'Seleziona campo...');
+                populateSelect('coltivazione-campo', campi, '_id', 'nome', 'Seleziona campo...');
             } catch (error) {
                 console.error('Errore:', error);
                 document.getElementById('table-coltivazioni').innerHTML = 
@@ -137,7 +137,7 @@
 
             tbody.innerHTML = coltivazioni.map(c => `
                 <tr>
-                    <td><strong>${c.nome_campo}</strong> (${c.superficie ? formatNumber(c.superficie) + ' ha' : '-'})</td>
+                    <td><strong>${c.id_campo?.nome || '-'}</strong> (${c.id_campo?.superficie ? formatNumber(c.id_campo.superficie) + ' ha' : '-'})</td>
                     <td>${c.tipo_coltura}</td>
                     <td>${formatDate(c.data_semina)}</td>
                     <td>${c.periodo || '-'}</td>
@@ -180,7 +180,7 @@
             event.preventDefault();
             
             const data = {
-                id_campo: parseInt(document.getElementById('coltivazione-campo').value),
+                id_campo: document.getElementById('coltivazione-campo').value,
                 tipo_coltura: document.getElementById('coltivazione-tipo').value,
                 data_semina: document.getElementById('coltivazione-data').value || null,
                 periodo: document.getElementById('coltivazione-periodo').value || null,
