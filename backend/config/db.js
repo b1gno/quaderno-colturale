@@ -19,6 +19,7 @@ const MONGODB_URI = getMongoUri();
 const cached = global.mongoose || (global.mongoose = { conn: null, promise: null });
 
 const connectDB = async () => {
+    console.log("Tentativo di connessione a:", MONGODB_URI ? MONGODB_URI.split('@')[1] : "URL MANCANTE");
   if (!MONGODB_URI) {
     throw new Error('MONGODB_URI non definito. Aggiungi backend/.env con MONGODB_URI oppure imposta DB_HOST/DB_NAME.');
   }
