@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quaderno di Campo Digitale</title>
+    <title>Dashboard - Quaderno di Campo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen">
-    <!-- Navbar -->
+<body class="min-h-screen font-sans antialiased">
     <nav class="bg-emerald-700 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <h1 class="text-xl font-bold tracking-tight">🌾 Quaderno di Campo</h1>
-                <ul class="flex gap-1">
-                    <li><a href="index.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-white/20 transition-colors">Dashboard</a></li>
+                <ul class="flex gap-1 items-center">
+                    <li><a href="index.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-white/20">Dashboard</a></li>
                     <li><a href="campi.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Campi</a></li>
                     <li><a href="coltivazioni.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Coltivazioni</a></li>
                     <li><a href="prodotti.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Magazzino</a></li>
@@ -25,68 +25,69 @@
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h2 class="text-2xl font-bold text-emerald-700 mb-6 pb-2 border-b-3 border-emerald-600">Dashboard</h2>
+        <h2 class="text-2xl font-bold mb-6 pb-2 border-b-3" style="color:var(--primary);border-color:var(--primary)">Dashboard</h2>
 
-        <!-- Statistiche -->
+        <!-- Stats -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white rounded-xl shadow-sm border-l-4 border-emerald-500 p-5">
-                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Campi Attivi</p>
-                <p class="text-3xl font-bold text-emerald-600" id="stat-campi">-</p>
+            <div class="rounded-xl shadow-sm border-l-4 p-5" style="background:var(--surface);border-left-color:var(--primary)">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--text-secondary)">Campi Attivi</p>
+                <p class="text-3xl font-bold" id="stat-campi" style="color:var(--primary)">-</p>
             </div>
-            <div class="bg-white rounded-xl shadow-sm border-l-4 border-emerald-500 p-5">
-                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Coltivazioni</p>
-                <p class="text-3xl font-bold text-emerald-600" id="stat-coltivazioni">-</p>
+            <div class="rounded-xl shadow-sm border-l-4 p-5" style="background:var(--surface);border-left-color:var(--primary)">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--text-secondary)">Coltivazioni</p>
+                <p class="text-3xl font-bold" id="stat-coltivazioni" style="color:var(--primary)">-</p>
             </div>
-            <div class="bg-white rounded-xl shadow-sm border-l-4 border-emerald-500 p-5">
-                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Prodotti in Magazzino</p>
-                <p class="text-3xl font-bold text-emerald-600" id="stat-prodotti">-</p>
+            <div class="rounded-xl shadow-sm border-l-4 p-5" style="background:var(--surface);border-left-color:var(--primary)">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--text-secondary)">Prodotti in Magazzino</p>
+                <p class="text-3xl font-bold" id="stat-prodotti" style="color:var(--primary)">-</p>
             </div>
-            <div class="bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-5">
-                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">⚠️ Sotto Scorta</p>
-                <p class="text-3xl font-bold text-red-600" id="stat-sotto-scorta">-</p>
+            <div class="rounded-xl shadow-sm border-l-4 p-5" style="background:var(--surface);border-left-color:var(--danger)">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--text-secondary)">⚠️ Sotto Scorta</p>
+                <p class="text-3xl font-bold" id="stat-sotto-scorta" style="color:var(--danger)">-</p>
             </div>
         </div>
 
-        <!-- Prodotti sotto scorta -->
-        <div id="section-sotto-scorta" class="bg-white rounded-xl shadow-sm p-6 mb-8 hidden">
-            <h3 class="text-lg font-semibold text-red-700 mb-4">⚠️ Prodotti Sotto Scorta Minima</h3>
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="rounded-xl shadow-sm p-5" style="background:var(--surface)">
+                <h3 class="text-sm font-semibold mb-4" style="color:var(--text)">📊 Coltivazioni per Campo</h3>
+                <canvas id="chart-coltivazioni"></canvas>
+            </div>
+            <div class="rounded-xl shadow-sm p-5" style="background:var(--surface)">
+                <h3 class="text-sm font-semibold mb-4" style="color:var(--text)">📊 Distribuzione Categorie Prodotti</h3>
+                <canvas id="chart-categorie"></canvas>
+            </div>
+        </div>
+
+        <!-- Sotto scorta -->
+        <div id="section-sotto-scorta" class="rounded-xl shadow-sm p-6 mb-8 hidden" style="background:var(--surface)">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold" style="color:var(--danger)">⚠️ Prodotti Sotto Scorta</h3>
+                <button onclick="exportCSV('table-sotto-scorta','sotto-scorta')" class="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors" style="background:var(--danger-light);color:var(--danger)">📥 CSV</button>
+            </div>
             <div class="overflow-x-auto">
-                <table class="data-table w-full text-sm">
-                    <thead>
-                        <tr class="bg-red-50 text-red-800">
-                            <th class="px-4 py-3 text-left font-semibold">Prodotto</th>
-                            <th class="px-4 py-3 text-left font-semibold">Categoria</th>
-                            <th class="px-4 py-3 text-left font-semibold">Disponibile</th>
-                            <th class="px-4 py-3 text-left font-semibold">Scorta Minima</th>
-                            <th class="px-4 py-3 text-left font-semibold">Unità</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-sotto-scorta" class="divide-y divide-slate-100">
-                    </tbody>
+                <table class="w-full text-sm">
+                    <thead><tr class="text-left font-semibold" style="background:var(--danger-light);color:var(--danger)">
+                        <th class="px-4 py-3">Prodotto</th><th class="px-4 py-3">Categoria</th><th class="px-4 py-3">Disponibile</th><th class="px-4 py-3">Scorta Minima</th><th class="px-4 py-3">Unità</th>
+                    </tr></thead>
+                    <tbody id="table-sotto-scorta" class="divide-y" style="border-color:var(--border)"></tbody>
                 </table>
             </div>
         </div>
 
         <!-- Ultime attività -->
-        <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="rounded-xl shadow-sm p-6" style="background:var(--surface)">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-slate-800">📋 Ultime Attività Registrate</h3>
-                <a href="attivita.html" class="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors">Vedi tutte →</a>
+                <h3 class="text-lg font-semibold" style="color:var(--text)">📋 Ultime Attività</h3>
+                <a href="attivita.html" class="text-sm font-medium transition-colors" style="color:var(--primary)">Vedi tutte →</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead>
-                        <tr class="bg-slate-100 text-slate-600">
-                            <th class="px-4 py-3 text-left font-semibold">Data</th>
-                            <th class="px-4 py-3 text-left font-semibold">Campo</th>
-                            <th class="px-4 py-3 text-left font-semibold">Tipo</th>
-                            <th class="px-4 py-3 text-left font-semibold">Descrizione</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-attivita" class="divide-y divide-slate-100">
-                        <tr>
-                            <td colspan="4" class="px-4 py-6 text-center text-slate-400 italic">Caricamento...</td>
-                        </tr>
+                    <thead><tr class="text-left font-semibold" style="background:var(--surface-hover);color:var(--text-secondary)">
+                        <th class="px-4 py-3">Data</th><th class="px-4 py-3">Campo</th><th class="px-4 py-3">Tipo</th><th class="px-4 py-3">Descrizione</th>
+                    </tr></thead>
+                    <tbody id="table-attivita" class="divide-y" style="border-color:var(--border)">
+                        <tr><td colspan="4" class="px-4 py-6 text-center italic" style="color:var(--text-secondary)">Caricamento...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -98,68 +99,87 @@
         async function loadDashboard() {
             try {
                 const [campi, coltivazioni, prodotti, magazzino] = await Promise.all([
-                    apiGet('/campi'),
-                    apiGet('/coltivazioni'),
-                    apiGet('/prodotti'),
-                    apiGet('/magazzino/statistiche')
+                    apiGet('/campi'), apiGet('/coltivazioni'), apiGet('/prodotti'), apiGet('/magazzino/statistiche')
                 ]);
-
                 document.getElementById('stat-campi').textContent = campi.length;
                 document.getElementById('stat-coltivazioni').textContent = coltivazioni.length;
                 document.getElementById('stat-prodotti').textContent = magazzino.totale_prodotti;
                 document.getElementById('stat-sotto-scorta').textContent = magazzino.prodotti_sotto_scorta;
 
                 if (magazzino.prodotti_sotto_scorta > 0) {
-                    const prodottiSottoScorta = await apiGet('/prodotti/sotto-scorta');
-                    displayProdottiSottoScorta(prodottiSottoScorta);
+                    const ps = await apiGet('/prodotti/sotto-scorta');
+                    const sec = document.getElementById('section-sotto-scorta');
+                    sec.classList.remove('hidden');
+                    document.getElementById('table-sotto-scorta').innerHTML = ps.map(p =>
+                        `<tr class="hover:bg-opacity-50 transition-colors" style="hover:background:var(--surface-hover)">
+                            <td class="px-4 py-3 font-medium">${p.nome}</td>
+                            <td class="px-4 py-3" style="color:var(--text-secondary)">${p.categoria}</td>
+                            <td class="px-4 py-3 font-bold" style="color:var(--danger)">${formatNumber(p.quantita_disponibile)}</td>
+                            <td class="px-4 py-3">${formatNumber(p.scorta_minima)}</td>
+                            <td class="px-4 py-3" style="color:var(--text-secondary)">${p.unita_misura}</td>
+                        </tr>`
+                    ).join('');
                 }
 
-                const attivita = await apiGet('/attivita');
-                displayUltimeAttivita(attivita.slice(0, 5));
+                // Ultime attività
+                const att = await apiGet('/attivita');
+                const tb = document.getElementById('table-attivita');
+                if (!att.length) {
+                    tb.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center italic" style="color:var(--text-secondary)">Nessuna attività</td></tr>';
+                } else {
+                    tb.innerHTML = att.slice(0, 5).map(a =>
+                        `<tr class="hover:bg-opacity-50 transition-colors" style="hover:background:var(--surface-hover)">
+                            <td class="px-4 py-3">${formatDate(a.data)}</td>
+                            <td class="px-4 py-3 font-medium">${a.id_campo?.nome || '-'}</td>
+                            <td class="px-4 py-3"><span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full" style="background:var(--primary-light);color:var(--primary)">${a.tipo_attivita || '-'}</span></td>
+                            <td class="px-4 py-3" style="color:var(--text-secondary)">${a.descrizione || '-'}</td>
+                        </tr>`
+                    ).join('');
+                }
 
-            } catch (error) {
-                console.error('Errore caricamento dashboard:', error);
-                showError('Errore nel caricamento dei dati');
+                // Charts
+                drawCharts(campi, coltivazioni, prodotti);
+            } catch (e) {
+                console.error(e);
+                showError('Errore caricamento dashboard');
             }
         }
 
-        function displayProdottiSottoScorta(prodotti) {
-            const section = document.getElementById('section-sotto-scorta');
-            const tbody = document.getElementById('table-sotto-scorta');
-
-            if (prodotti.length === 0) {
-                section.classList.add('hidden');
-                return;
+        function drawCharts(campi, coltivazioni, prodotti) {
+            // Coltivazioni per campo
+            const ctx1 = document.getElementById('chart-coltivazioni')?.getContext('2d');
+            if (ctx1 && campi.length) {
+                const labels = campi.map(c => c.nome);
+                const data = campi.map(c => coltivazioni.filter(col => String(col.id_campo?._id || col.id_campo) === String(c._id)).length);
+                new Chart(ctx1, {
+                    type: 'bar',
+                    data: { labels, datasets: [{ label: 'Coltivazioni', data, backgroundColor: '#22c55e', borderRadius: 6 }] },
+                    options: { responsive: true, plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                            x: { ticks: { maxRotation: 0 } } }
+                    }
+                });
+            } else if (ctx1) {
+                ctx1.canvas.parentElement.innerHTML = '<p class="text-sm italic" style="color:var(--text-secondary)">Nessun dato</p>';
             }
 
-            section.classList.remove('hidden');
-            tbody.innerHTML = prodotti.map(p => `
-                <tr class="hover:bg-red-50 transition-colors">
-                    <td class="px-4 py-3 font-medium">${p.nome}</td>
-                    <td class="px-4 py-3 text-slate-600">${p.categoria}</td>
-                    <td class="px-4 py-3 font-bold text-red-600">${p.quantita_disponibile}</td>
-                    <td class="px-4 py-3">${p.scorta_minima}</td>
-                    <td class="px-4 py-3 text-slate-600">${p.unita_misura}</td>
-                </tr>
-            `).join('');
-        }
-
-        function displayUltimeAttivita(attivita) {
-            const tbody = document.getElementById('table-attivita');
-
-            if (attivita.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-slate-400 italic">Nessuna attività registrata</td></tr>';
-                return;
+            // Categorie prodotti
+            const ctx2 = document.getElementById('chart-categorie')?.getContext('2d');
+            if (ctx2 && prodotti.length) {
+                const cats = {};
+                prodotti.forEach(p => { cats[p.categoria || 'altro'] = (cats[p.categoria || 'altro'] || 0) + 1; });
+                const colors = { fitosanitario: '#3b82f6', concime: '#22c55e', diserbante: '#f59e0b', altro: '#94a3b8' };
+                new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(cats),
+                        datasets: [{ data: Object.values(cats), backgroundColor: Object.keys(cats).map(k => colors[k] || '#94a3b8') }]
+                    },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+                });
+            } else if (ctx2) {
+                ctx2.canvas.parentElement.innerHTML = '<p class="text-sm italic" style="color:var(--text-secondary)">Nessun dato</p>';
             }
-
-            tbody.innerHTML = attivita.map(a => `
-                <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="px-4 py-3">${formatDate(a.data)}</td>
-                    <td class="px-4 py-3">${a.id_campo?.nome || '-'}</td>
-                    <td class="px-4 py-3"><span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-1 rounded-full">${a.tipo_attivita || 'Non specificato'}</span></td>
-                    <td class="px-4 py-3 text-slate-600">${a.descrizione || '-'}</td>
-                </tr>
-            `).join('');
         }
 
         document.addEventListener('DOMContentLoaded', loadDashboard);

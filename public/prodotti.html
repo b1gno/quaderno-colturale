@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestione Magazzino - Quaderno di Campo</title>
+    <title>Magazzino - Quaderno di Campo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen">
+<body class="min-h-screen font-sans antialiased">
     <nav class="bg-emerald-700 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <h1 class="text-xl font-bold tracking-tight">🌾 Quaderno di Campo</h1>
-                <ul class="flex gap-1">
+                <ul class="flex gap-1 items-center">
                     <li><a href="index.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Dashboard</a></li>
                     <li><a href="campi.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Campi</a></li>
                     <li><a href="coltivazioni.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Coltivazioni</a></li>
-                    <li><a href="prodotti.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-white/20 transition-colors">Magazzino</a></li>
+                    <li><a href="prodotti.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-white/20">Magazzino</a></li>
                     <li><a href="attivita.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Attività</a></li>
                 </ul>
             </div>
@@ -24,56 +24,41 @@
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-emerald-700">Gestione Magazzino</h2>
-            <div class="flex gap-3">
-                <button class="bg-white text-slate-700 font-medium px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors shadow-sm" onclick="openCaricoModal()">📦 Carico</button>
-                <button class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg transition-colors shadow-sm" onclick="openAddProdottoModal()">+ Nuovo Prodotto</button>
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <h2 class="text-2xl font-bold" style="color:var(--primary)">Gestione Magazzino</h2>
+            <div class="flex gap-2">
+                <button onclick="exportCSV('table-prodotti','prodotti')" class="text-sm font-medium px-3 py-2 rounded-lg transition-colors" style="background:var(--surface);color:var(--text);border:1px solid var(--border)">📥 CSV</button>
+                <button onclick="openCaricoModal()" class="text-sm font-medium px-3 py-2 rounded-lg transition-colors" style="background:var(--surface);color:var(--text);border:1px solid var(--border)">📦 Carico</button>
+                <button onclick="openAddProdottoModal()" class="text-white font-medium px-4 py-2 rounded-lg transition-colors shadow-sm" style="background:var(--primary)">+ Nuovo Prodotto</button>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
-            <h3 class="text-lg font-semibold text-slate-800 mb-4">Prodotti in Magazzino</h3>
+        <!-- Prodotti -->
+        <div class="rounded-xl shadow-sm p-6 mb-8" style="background:var(--surface)">
+            <h3 class="text-lg font-semibold mb-4" style="color:var(--text)">Prodotti in Magazzino</h3>
+            <div class="mb-4"><input id="search-prodotti" type="text" placeholder="🔍 Cerca prodotti..." class="w-full sm:w-64 px-3 py-2 rounded-lg text-sm outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead>
-                        <tr class="bg-slate-100 text-slate-600">
-                            <th class="px-4 py-3 text-left font-semibold">Prodotto</th>
-                            <th class="px-4 py-3 text-left font-semibold">Categoria</th>
-                            <th class="px-4 py-3 text-left font-semibold">Quantità</th>
-                            <th class="px-4 py-3 text-left font-semibold">Scorta Minima</th>
-                            <th class="px-4 py-3 text-left font-semibold">Unità</th>
-                            <th class="px-4 py-3 text-left font-semibold">Stato</th>
-                            <th class="px-4 py-3 text-left font-semibold">Azioni</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-prodotti" class="divide-y divide-slate-100">
-                        <tr>
-                            <td colspan="7" class="px-4 py-6 text-center text-slate-400 italic">Caricamento prodotti...</td>
-                        </tr>
-                    </tbody>
+                    <thead><tr class="text-left font-semibold" style="background:var(--surface-hover);color:var(--text-secondary)">
+                        <th class="px-4 py-3">Prodotto</th><th class="px-4 py-3">Categoria</th><th class="px-4 py-3">Quantità</th>
+                        <th class="px-4 py-3">Scorta Minima</th><th class="px-4 py-3">Unità</th><th class="px-4 py-3">Stato</th><th class="px-4 py-3">Azioni</th>
+                    </tr></thead>
+                    <tbody id="table-prodotti" class="divide-y" style="border-color:var(--border)"></tbody>
                 </table>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-slate-800 mb-4">Ultimi Movimenti</h3>
+        <!-- Movimenti -->
+        <div class="rounded-xl shadow-sm p-6" style="background:var(--surface)">
+            <h3 class="text-lg font-semibold mb-4" style="color:var(--text)">Ultimi Movimenti</h3>
+            <div class="mb-4"><input id="search-movimenti" type="text" placeholder="🔍 Cerca movimenti..." class="w-full sm:w-64 px-3 py-2 rounded-lg text-sm outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead>
-                        <tr class="bg-slate-100 text-slate-600">
-                            <th class="px-4 py-3 text-left font-semibold">Data</th>
-                            <th class="px-4 py-3 text-left font-semibold">Prodotto</th>
-                            <th class="px-4 py-3 text-left font-semibold">Tipo</th>
-                            <th class="px-4 py-3 text-left font-semibold">Quantità</th>
-                            <th class="px-4 py-3 text-left font-semibold">Note</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-movimenti" class="divide-y divide-slate-100">
-                        <tr>
-                            <td colspan="5" class="px-4 py-6 text-center text-slate-400 italic">Caricamento...</td>
-                        </tr>
-                    </tbody>
+                    <thead><tr class="text-left font-semibold" style="background:var(--surface-hover);color:var(--text-secondary)">
+                        <th class="px-4 py-3">Data</th><th class="px-4 py-3">Prodotto</th><th class="px-4 py-3">Tipo</th>
+                        <th class="px-4 py-3">Quantità</th><th class="px-4 py-3">Note</th>
+                    </tr></thead>
+                    <tbody id="table-movimenti" class="divide-y" style="border-color:var(--border)"></tbody>
                 </table>
             </div>
         </div>
@@ -81,54 +66,22 @@
 
     <!-- Modal Prodotto -->
     <div id="modal-prodotto" class="modal">
-        <div class="modal-content bg-white rounded-xl shadow-2xl p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h3 id="modal-title-prodotto" class="text-lg font-bold text-slate-800">Nuovo Prodotto</h3>
-                <button class="text-slate-400 hover:text-slate-600 text-2xl leading-none transition-colors" onclick="closeModal('modal-prodotto')">&times;</button>
-            </div>
+        <div class="modal-content rounded-xl shadow-2xl p-6" style="background:var(--surface)">
+            <div class="flex items-center justify-between mb-6"><h3 id="modal-title-prodotto" class="text-lg font-bold" style="color:var(--text)">Nuovo Prodotto</h3><button class="text-2xl" style="color:var(--text-secondary)" onclick="closeModal('modal-prodotto')">&times;</button></div>
             <form id="form-prodotto" onsubmit="saveProdotto(event)">
                 <input type="hidden" id="prodotto-id">
-
-                <div class="mb-4">
-                    <label for="prodotto-nome" class="block text-sm font-medium text-slate-700 mb-1">Nome Prodotto *</label>
-                    <input type="text" id="prodotto-nome" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
+                <div class="mb-4"><label class="block text-sm font-medium mb-1" style="color:var(--text)">Nome *</label><input type="text" id="prodotto-nome" required class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div><label class="block text-sm font-medium mb-1" style="color:var(--text)">Categoria</label><select id="prodotto-categoria" class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"><option value="altro">Altro</option><option value="fitosanitario">Fitosanitario</option><option value="concime">Concime</option><option value="diserbante">Diserbante</option></select></div>
+                    <div><label class="block text-sm font-medium mb-1" style="color:var(--text)">Unità</label><select id="prodotto-unita" class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"><option value="kg">Kg</option><option value="litri">Litri</option><option value="quintali">Quintali</option><option value="unità">Unità</option></select></div>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label for="prodotto-categoria" class="block text-sm font-medium text-slate-700 mb-1">Categoria</label>
-                        <select id="prodotto-categoria" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow bg-white">
-                            <option value="altro">Altro</option>
-                            <option value="fitosanitario">Fitosanitario</option>
-                            <option value="concime">Concime</option>
-                            <option value="diserbante">Diserbante</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="prodotto-unita" class="block text-sm font-medium text-slate-700 mb-1">Unità di Misura</label>
-                        <select id="prodotto-unita" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow bg-white">
-                            <option value="kg">Kg</option>
-                            <option value="litri">Litri</option>
-                            <option value="quintali">Quintali</option>
-                            <option value="unità">Unità</option>
-                        </select>
-                    </div>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div><label class="block text-sm font-medium mb-1" style="color:var(--text)">Quantità</label><input type="number" id="prodotto-quantita" step="0.01" min="0" value="0" class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></div>
+                    <div><label class="block text-sm font-medium mb-1" style="color:var(--text)">Scorta Minima</label><input type="number" id="prodotto-scorta" step="0.01" min="0" value="0" class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></div>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label for="prodotto-quantita" class="block text-sm font-medium text-slate-700 mb-1">Quantità Iniziale</label>
-                        <input type="number" id="prodotto-quantita" step="0.01" min="0" value="0" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
-                    </div>
-                    <div>
-                        <label for="prodotto-scorta" class="block text-sm font-medium text-slate-700 mb-1">Scorta Minima</label>
-                        <input type="number" id="prodotto-scorta" step="0.01" min="0" value="0" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
-                    </div>
-                </div>
-
                 <div class="flex gap-3 justify-end">
-                    <button type="button" class="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors" onclick="closeModal('modal-prodotto')">Annulla</button>
-                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-sm">Salva</button>
+                    <button type="button" class="px-4 py-2 text-sm font-medium rounded-lg transition-colors" style="background:var(--surface-hover);color:var(--text)" onclick="closeModal('modal-prodotto')">Annulla</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white rounded-lg shadow-sm" style="background:var(--primary)">Salva</button>
                 </div>
             </form>
         </div>
@@ -136,32 +89,15 @@
 
     <!-- Modal Carico -->
     <div id="modal-carico" class="modal">
-        <div class="modal-content bg-white rounded-xl shadow-2xl p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-bold text-slate-800">Registra Carico Magazzino</h3>
-                <button class="text-slate-400 hover:text-slate-600 text-2xl leading-none transition-colors" onclick="closeModal('modal-carico')">&times;</button>
-            </div>
+        <div class="modal-content rounded-xl shadow-2xl p-6" style="background:var(--surface)">
+            <div class="flex items-center justify-between mb-6"><h3 class="text-lg font-bold" style="color:var(--text)">Registra Carico</h3><button class="text-2xl" style="color:var(--text-secondary)" onclick="closeModal('modal-carico')">&times;</button></div>
             <form id="form-carico" onsubmit="saveCarico(event)">
-                <div class="mb-4">
-                    <label for="carico-prodotto" class="block text-sm font-medium text-slate-700 mb-1">Prodotto *</label>
-                    <select id="carico-prodotto" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow bg-white">
-                        <option value="">Seleziona prodotto...</option>
-                    </select>
-                </div>
-
-                <div class="mb-4">
-                    <label for="carico-quantita" class="block text-sm font-medium text-slate-700 mb-1">Quantità da Caricare *</label>
-                    <input type="number" id="carico-quantita" step="0.01" min="0.01" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
-                </div>
-
-                <div class="mb-6">
-                    <label for="carico-note" class="block text-sm font-medium text-slate-700 mb-1">Note</label>
-                    <textarea id="carico-note" rows="3" placeholder="Es: Acquisto da fornitore X" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow resize-y"></textarea>
-                </div>
-
+                <div class="mb-4"><label class="block text-sm font-medium mb-1" style="color:var(--text)">Prodotto *</label><select id="carico-prodotto" required class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></select></div>
+                <div class="mb-4"><label class="block text-sm font-medium mb-1" style="color:var(--text)">Quantità *</label><input type="number" id="carico-quantita" step="0.01" min="0.01" required class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></div>
+                <div class="mb-6"><label class="block text-sm font-medium mb-1" style="color:var(--text)">Note</label><textarea id="carico-note" rows="3" class="w-full px-3 py-2 rounded-lg outline-none resize-y" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></textarea></div>
                 <div class="flex gap-3 justify-end">
-                    <button type="button" class="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors" onclick="closeModal('modal-carico')">Annulla</button>
-                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-sm">Registra Carico</button>
+                    <button type="button" class="px-4 py-2 text-sm font-medium rounded-lg" style="background:var(--surface-hover);color:var(--text)" onclick="closeModal('modal-carico')">Annulla</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white rounded-lg shadow-sm" style="background:var(--primary)">Registra</button>
                 </div>
             </form>
         </div>
@@ -169,180 +105,59 @@
 
     <script src="js/app.js"></script>
     <script>
-        let prodotti = [];
-        let editingId = null;
-
-        async function loadData() {
-            await Promise.all([loadProdotti(), loadMovimenti()]);
-        }
-
+        let prodotti = [], editingId = null;
+        async function loadData() { await Promise.all([loadProdotti(), loadMovimenti()]); }
         async function loadProdotti() {
             try {
                 prodotti = await apiGet('/prodotti');
-                displayProdotti();
-                populateSelect('carico-prodotto', prodotti, '_id', 'nome', 'Seleziona prodotto...');
-            } catch (error) {
-                console.error('Errore:', error);
-                document.getElementById('table-prodotti').innerHTML =
-                    '<tr><td colspan="7" class="px-4 py-6 text-center text-red-500 font-medium">Errore nel caricamento</td></tr>';
-            }
+                const tb = document.getElementById('table-prodotti');
+                if (!prodotti.length) { tb.innerHTML = '<tr><td colspan="7" class="px-4 py-6 text-center italic" style="color:var(--text-secondary)">Nessun prodotto</td></tr>'; return; }
+                tb.innerHTML = prodotti.map(p => { const low = p.quantita_disponibile <= p.scorta_minima; return `<tr class="transition-colors" style="hover:background:var(--surface-hover)">
+                    <td class="px-4 py-3 font-medium">${p.nome}</td>
+                    <td class="px-4 py-3">${p.categoria ? '<span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full" style="background:var(--surface-hover);color:var(--text-secondary)">' + p.categoria + '</span>' : '-'}</td>
+                    <td class="px-4 py-3 ${low ? 'font-bold' : ''}" ${low ? 'style="color:' + getComputedStyle(document.body).getPropertyValue('--danger') + '"' : ''}>${formatNumber(p.quantita_disponibile)}</td>
+                    <td class="px-4 py-3">${formatNumber(p.scorta_minima)}</td>
+                    <td class="px-4 py-3" style="color:var(--text-secondary)">${p.unita_misura}</td>
+                    <td class="px-4 py-3">${low ? '<span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full" style="background:var(--danger-light);color:var(--danger)">⚠️ Sotto scorta</span>' : '<span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full" style="background:var(--primary-light);color:var(--primary)">✓ OK</span>'}</td>
+                    <td class="px-4 py-3"><div class="flex gap-2">
+                        <button class="text-sm font-medium hover:underline" style="color:var(--primary)" onclick="editProdotto('${p._id}')">Modifica</button>
+                        <button class="text-sm font-medium hover:underline" style="color:var(--danger)" onclick="deleteProdotto('${p._id}','${p.nome.replace(/'/g,"\\'")}')">Elimina</button>
+                    </div></td>
+                </tr>`; }).join('');
+                populateSelect('carico-prodotto', prodotti, '_id', 'nome');
+                setupSearch('search-prodotti', 'table-prodotti');
+            } catch(e) { console.error(e); }
         }
-
-        function displayProdotti() {
-            const tbody = document.getElementById('table-prodotti');
-
-            if (prodotti.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-6 text-center text-slate-400 italic">Nessun prodotto in magazzino</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = prodotti.map(p => {
-                const isLow = p.quantita_disponibile <= p.scorta_minima;
-                return `
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-4 py-3 font-medium">${p.nome}</td>
-                        <td class="px-4 py-3">${p.categoria ? '<span class="inline-block bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-full">' + p.categoria + '</span>' : '-'}</td>
-                        <td class="px-4 py-3 ${isLow ? 'font-bold text-red-600' : ''}">${formatNumber(p.quantita_disponibile)}</td>
-                        <td class="px-4 py-3">${formatNumber(p.scorta_minima)}</td>
-                        <td class="px-4 py-3 text-slate-600">${p.unita_misura}</td>
-                        <td class="px-4 py-3">${isLow
-                            ? '<span class="inline-block bg-red-100 text-red-700 text-xs font-medium px-2.5 py-1 rounded-full">⚠️ Sotto scorta</span>'
-                            : '<span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-1 rounded-full">✓ OK</span>'
-                        }</td>
-                        <td class="px-4 py-3">
-                            <div class="flex gap-2">
-                                <button class="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline transition-colors" onclick="editProdotto('${p._id}')">Modifica</button>
-                                <button class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline transition-colors" onclick="deleteProdotto('${p._id}', '${p.nome}')">Elimina</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
         async function loadMovimenti() {
             try {
-                const movimenti = await apiGet('/magazzino/movimenti');
-                displayMovimenti(movimenti.slice(0, 20));
-            } catch (error) {
-                console.error('Errore:', error);
-            }
+                const m = await apiGet('/magazzino/movimenti');
+                const tb = document.getElementById('table-movimenti');
+                if (!m.length) { tb.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center italic" style="color:var(--text-secondary)">Nessun movimento</td></tr>'; return; }
+                tb.innerHTML = m.slice(0, 20).map(x => { const p = x.id_prodotto || {}; const carico = x.tipo_movimento === 'carico'; return `<tr class="transition-colors" style="hover:background:var(--surface-hover)">
+                    <td class="px-4 py-3">${formatDate(x.data)}</td>
+                    <td class="px-4 py-3">${p.nome || '-'}</td>
+                    <td class="px-4 py-3">${carico ? '<span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full" style="background:var(--primary-light);color:var(--primary)">CARICO</span>' : '<span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full" style="background:var(--danger-light);color:var(--danger)">SCARICO</span>'}</td>
+                    <td class="px-4 py-3 font-medium">${formatNumber(x.quantita)} ${p.unita_misura || ''}</td>
+                    <td class="px-4 py-3" style="color:var(--text-secondary)">${x.note || '-'}</td>
+                </tr>`; }).join('');
+                setupSearch('search-movimenti', 'table-movimenti');
+            } catch(e) { console.error(e); }
         }
-
-        function displayMovimenti(movimenti) {
-            const tbody = document.getElementById('table-movimenti');
-
-            if (movimenti.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-slate-400 italic">Nessun movimento registrato</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = movimenti.map(m => {
-                const prodotto = m.id_prodotto || {};
-                const isCarico = m.tipo_movimento === 'carico';
-                return `
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-4 py-3">${formatDate(m.data)}</td>
-                        <td class="px-4 py-3">${prodotto.nome || m.nome_prodotto || '-'}</td>
-                        <td class="px-4 py-3">${isCarico
-                            ? '<span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-1 rounded-full">CARICO</span>'
-                            : '<span class="inline-block bg-red-100 text-red-700 text-xs font-medium px-2.5 py-1 rounded-full">SCARICO</span>'
-                        }</td>
-                        <td class="px-4 py-3 font-medium">${formatNumber(m.quantita)} ${prodotto.unita_misura || m.unita_misura || ''}</td>
-                        <td class="px-4 py-3 text-slate-500">${m.note || '-'}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function openAddProdottoModal() {
-            editingId = null;
-            document.getElementById('modal-title-prodotto').textContent = 'Nuovo Prodotto';
-            document.getElementById('form-prodotto').reset();
-            openModal('modal-prodotto');
-        }
-
+        function openAddProdottoModal() { editingId = null; document.getElementById('modal-title-prodotto').textContent = 'Nuovo Prodotto'; document.getElementById('form-prodotto').reset(); openModal('modal-prodotto'); }
         async function editProdotto(id) {
-            try {
-                const prodotto = await apiGet('/prodotti/' + id);
-                editingId = id;
-
-                document.getElementById('modal-title-prodotto').textContent = 'Modifica Prodotto';
-                document.getElementById('prodotto-nome').value = prodotto.nome;
-                document.getElementById('prodotto-categoria').value = prodotto.categoria;
-                document.getElementById('prodotto-unita').value = prodotto.unita_misura;
-                document.getElementById('prodotto-quantita').value = prodotto.quantita_disponibile;
-                document.getElementById('prodotto-scorta').value = prodotto.scorta_minima;
-
-                openModal('modal-prodotto');
-            } catch (error) {
-                showError('Errore nel caricamento del prodotto');
-            }
+            try { const p = await apiGet('/prodotti/' + id); editingId = id; document.getElementById('modal-title-prodotto').textContent = 'Modifica Prodotto'; document.getElementById('prodotto-nome').value = p.nome; document.getElementById('prodotto-categoria').value = p.categoria; document.getElementById('prodotto-unita').value = p.unita_misura; document.getElementById('prodotto-quantita').value = p.quantita_disponibile; document.getElementById('prodotto-scorta').value = p.scorta_minima; openModal('modal-prodotto'); } catch(e) { showError('Errore'); }
         }
-
-        async function saveProdotto(event) {
-            event.preventDefault();
-
-            const data = {
-                nome: document.getElementById('prodotto-nome').value,
-                categoria: document.getElementById('prodotto-categoria').value,
-                unita_misura: document.getElementById('prodotto-unita').value,
-                quantita_disponibile: parseFloat(document.getElementById('prodotto-quantita').value),
-                scorta_minima: parseFloat(document.getElementById('prodotto-scorta').value)
-            };
-
-            try {
-                if (editingId) {
-                    await apiPut('/prodotti/' + editingId, data);
-                    showSuccess('Prodotto aggiornato con successo');
-                } else {
-                    await apiPost('/prodotti', data);
-                    showSuccess('Prodotto creato con successo');
-                }
-
-                closeModal('modal-prodotto');
-                loadData();
-            } catch (error) {
-                showError(error.message);
-            }
+        async function saveProdotto(e) {
+            e.preventDefault();
+            const d = { nome: document.getElementById('prodotto-nome').value, categoria: document.getElementById('prodotto-categoria').value, unita_misura: document.getElementById('prodotto-unita').value, quantita_disponibile: parseFloat(document.getElementById('prodotto-quantita').value), scorta_minima: parseFloat(document.getElementById('prodotto-scorta').value) };
+            try { if (editingId) { await apiPut('/prodotti/' + editingId, d); showSuccess('Aggiornato'); } else { await apiPost('/prodotti', d); showSuccess('Creato'); } closeModal('modal-prodotto'); loadData(); } catch(e) { showError(e.message); }
         }
-
-        async function deleteProdotto(id, nome) {
-            if (!confirmAction('Eliminare il prodotto "' + nome + '"?')) return;
-
-            try {
-                await apiDelete('/prodotti/' + id);
-                showSuccess('Prodotto eliminato');
-                loadData();
-            } catch (error) {
-                showError(error.message);
-            }
+        async function deleteProdotto(id, nome) { if (!confirmAction('Eliminare "' + nome + '"?')) return; try { await apiDelete('/prodotti/' + id); showSuccess('Eliminato'); loadData(); } catch(e) { showError(e.message); } }
+        function openCaricoModal() { document.getElementById('form-carico').reset(); openModal('modal-carico'); }
+        async function saveCarico(e) {
+            e.preventDefault();
+            try { await apiPost('/magazzino/carico', { id_prodotto: document.getElementById('carico-prodotto').value, quantita: parseFloat(document.getElementById('carico-quantita').value), note: document.getElementById('carico-note').value }); showSuccess('Carico registrato'); closeModal('modal-carico'); loadData(); } catch(e) { showError(e.message); }
         }
-
-        function openCaricoModal() {
-            document.getElementById('form-carico').reset();
-            openModal('modal-carico');
-        }
-
-        async function saveCarico(event) {
-            event.preventDefault();
-
-            const data = {
-                id_prodotto: document.getElementById('carico-prodotto').value,
-                quantita: parseFloat(document.getElementById('carico-quantita').value),
-                note: document.getElementById('carico-note').value
-            };
-
-            try {
-                await apiPost('/magazzino/carico', data);
-                showSuccess('Carico registrato con successo');
-                closeModal('modal-carico');
-                loadData();
-            } catch (error) {
-                showError(error.message);
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>

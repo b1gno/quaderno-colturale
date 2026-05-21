@@ -13,7 +13,7 @@
             gap: 1rem;
             margin-bottom: 0.75rem;
             padding: 0.75rem;
-            background: #f1f5f9;
+            background: var(--surface-hover);
             border-radius: 0.5rem;
         }
     </style>
@@ -240,13 +240,13 @@
             row.id = 'prodotto-row-' + id;
             row.innerHTML = `
                 <div>
-                    <select class="prodotto-select" data-id="${id}" required style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; background: white;">
+                    <select class="prodotto-select" data-id="${id}" required style="width: 100%; padding: 0.5rem 0.75rem; border:1px solid var(--border); border-radius: 0.5rem; background:var(--bg); color:var(--text);">
                         <option value="">Seleziona prodotto...</option>
                         ${prodotti.map(p => '<option value="' + p._id + '" data-disponibile="' + p.quantita_disponibile + '" data-unita="' + p.unita_misura + '">' + p.nome + ' (Disponibile: ' + formatNumber(p.quantita_disponibile) + ' ' + p.unita_misura + ')</option>').join('')}
                     </select>
                 </div>
                 <div>
-                    <input type="number" class="prodotto-quantita" data-id="${id}" placeholder="Quantità" step="0.01" min="0.01" required style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem;">
+                    <input type="number" class="prodotto-quantita" data-id="${id}" placeholder="Quantità" step="0.01" min="0.01" required style="width: 100%; padding: 0.5rem 0.75rem; border:1px solid var(--border); border-radius: 0.5rem; background:var(--bg); color:var(--text);">
                 </div>
                 <div>
                     <button type="button" class="text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg transition-colors" onclick="removeProdottoRow('${id}')">Rimuovi</button>

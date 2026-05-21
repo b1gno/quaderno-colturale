@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestione Campi - Quaderno di Campo</title>
+    <title>Campi - Quaderno di Campo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen">
+<body class="min-h-screen font-sans antialiased">
     <nav class="bg-emerald-700 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <h1 class="text-xl font-bold tracking-tight">🌾 Quaderno di Campo</h1>
-                <ul class="flex gap-1">
+                <ul class="flex gap-1 items-center">
                     <li><a href="index.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Dashboard</a></li>
-                    <li><a href="campi.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-white/20 transition-colors">Campi</a></li>
+                    <li><a href="campi.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-white/20">Campi</a></li>
                     <li><a href="coltivazioni.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Coltivazioni</a></li>
                     <li><a href="prodotti.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Magazzino</a></li>
                     <li><a href="attivita.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Attività</a></li>
@@ -24,27 +24,27 @@
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-emerald-700">Gestione Campi</h2>
-            <button class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg transition-colors shadow-sm" onclick="openAddCampoModal()">+ Nuovo Campo</button>
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <h2 class="text-2xl font-bold" style="color:var(--primary)">Gestione Campi</h2>
+            <div class="flex gap-2">
+                <button onclick="exportCSV('table-campi','campi')" class="text-sm font-medium px-3 py-2 rounded-lg transition-colors" style="background:var(--surface);color:var(--text);border:1px solid var(--border)">📥 CSV</button>
+                <button onclick="openAddCampoModal()" class="text-white font-medium px-4 py-2 rounded-lg transition-colors shadow-sm" style="background:var(--primary)">+ Nuovo Campo</button>
+            </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="rounded-xl shadow-sm overflow-hidden" style="background:var(--surface)">
+            <div class="p-4 border-b" style="border-color:var(--border)">
+                <input id="search-campi" type="text" placeholder="🔍 Cerca campi..." class="w-full sm:w-64 px-3 py-2 rounded-lg text-sm outline-none transition-shadow" style="background:var(--bg);color:var(--text);border:1px solid var(--border);focus:ring:2;focus:ring:var(--primary)">
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead>
-                        <tr class="bg-emerald-600 text-white">
-                            <th class="px-4 py-3 text-left font-semibold">Nome</th>
-                            <th class="px-4 py-3 text-left font-semibold">Superficie (ha)</th>
-                            <th class="px-4 py-3 text-left font-semibold">Tipo Terreno</th>
-                            <th class="px-4 py-3 text-left font-semibold">Note</th>
-                            <th class="px-4 py-3 text-left font-semibold">Azioni</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-campi" class="divide-y divide-slate-100">
-                        <tr>
-                            <td colspan="5" class="px-4 py-6 text-center text-slate-400 italic">Caricamento campi...</td>
-                        </tr>
+                    <thead><tr style="background:#059669;color:white">
+                        <th class="px-4 py-3 text-left font-semibold">Nome</th><th class="px-4 py-3 text-left font-semibold">Superficie (ha)</th>
+                        <th class="px-4 py-3 text-left font-semibold">Tipo Terreno</th><th class="px-4 py-3 text-left font-semibold">Note</th>
+                        <th class="px-4 py-3 text-left font-semibold">Azioni</th>
+                    </tr></thead>
+                    <tbody id="table-campi" class="divide-y" style="border-color:var(--border)">
+                        <tr><td colspan="5" class="px-4 py-6 text-center italic" style="color:var(--text-secondary)">Caricamento...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -53,45 +53,38 @@
 
     <!-- Modal -->
     <div id="modal-campo" class="modal">
-        <div class="modal-content bg-white rounded-xl shadow-2xl p-6">
+        <div class="modal-content rounded-xl shadow-2xl p-6" style="background:var(--surface)">
             <div class="flex items-center justify-between mb-6">
-                <h3 id="modal-title" class="text-lg font-bold text-slate-800">Nuovo Campo</h3>
-                <button class="text-slate-400 hover:text-slate-600 text-2xl leading-none transition-colors" onclick="closeModal('modal-campo')">&times;</button>
+                <h3 id="modal-title" class="text-lg font-bold" style="color:var(--text)">Nuovo Campo</h3>
+                <button class="text-2xl leading-none transition-colors" style="color:var(--text-secondary)" onclick="closeModal('modal-campo')">&times;</button>
             </div>
             <form id="form-campo" onsubmit="saveCampo(event)">
                 <input type="hidden" id="campo-id">
-
                 <div class="mb-4">
-                    <label for="campo-nome" class="block text-sm font-medium text-slate-700 mb-1">Nome Campo *</label>
-                    <input type="text" id="campo-nome" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
+                    <label class="block text-sm font-medium mb-1" style="color:var(--text)">Nome Campo *</label>
+                    <input type="text" id="campo-nome" required class="w-full px-3 py-2 rounded-lg outline-none transition-shadow" style="background:var(--bg);color:var(--text);border:1px solid var(--border)">
                 </div>
-
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label for="campo-superficie" class="block text-sm font-medium text-slate-700 mb-1">Superficie (ettari)</label>
-                        <input type="number" id="campo-superficie" step="0.01" min="0" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow">
+                        <label class="block text-sm font-medium mb-1" style="color:var(--text)">Superficie (ettari)</label>
+                        <input type="number" id="campo-superficie" step="0.01" min="0" class="w-full px-3 py-2 rounded-lg outline-none transition-shadow" style="background:var(--bg);color:var(--text);border:1px solid var(--border)">
                     </div>
                     <div>
-                        <label for="campo-terreno" class="block text-sm font-medium text-slate-700 mb-1">Tipo Terreno</label>
-                        <select id="campo-terreno" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow bg-white">
+                        <label class="block text-sm font-medium mb-1" style="color:var(--text)">Tipo Terreno</label>
+                        <select id="campo-terreno" class="w-full px-3 py-2 rounded-lg outline-none transition-shadow" style="background:var(--bg);color:var(--text);border:1px solid var(--border)">
                             <option value="">Seleziona...</option>
-                            <option value="Argilloso">Argilloso</option>
-                            <option value="Sabbioso">Sabbioso</option>
-                            <option value="Medio impasto">Medio impasto</option>
-                            <option value="Limoso">Limoso</option>
-                            <option value="Franco">Franco</option>
+                            <option value="Argilloso">Argilloso</option><option value="Sabbioso">Sabbioso</option>
+                            <option value="Medio impasto">Medio impasto</option><option value="Limoso">Limoso</option><option value="Franco">Franco</option>
                         </select>
                     </div>
                 </div>
-
                 <div class="mb-6">
-                    <label for="campo-note" class="block text-sm font-medium text-slate-700 mb-1">Note</label>
-                    <textarea id="campo-note" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-shadow resize-y"></textarea>
+                    <label class="block text-sm font-medium mb-1" style="color:var(--text)">Note</label>
+                    <textarea id="campo-note" rows="3" class="w-full px-3 py-2 rounded-lg outline-none transition-shadow resize-y" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></textarea>
                 </div>
-
                 <div class="flex gap-3 justify-end">
-                    <button type="button" class="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors" onclick="closeModal('modal-campo')">Annulla</button>
-                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-sm">Salva</button>
+                    <button type="button" class="px-4 py-2 text-sm font-medium rounded-lg transition-colors" style="background:var(--surface-hover);color:var(--text)" onclick="closeModal('modal-campo')">Annulla</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm" style="background:var(--primary)">Salva</button>
                 </div>
             </form>
         </div>
@@ -99,110 +92,50 @@
 
     <script src="js/app.js"></script>
     <script>
-        let campi = [];
-        let editingId = null;
-
+        let campi = [], editingId = null;
         async function loadCampi() {
             try {
                 campi = await apiGet('/campi');
-                displayCampi();
-            } catch (error) {
-                console.error('Errore caricamento campi:', error);
-                document.getElementById('table-campi').innerHTML =
-                    '<tr><td colspan="5" class="px-4 py-6 text-center text-red-500 font-medium">Errore nel caricamento dei campi</td></tr>';
-            }
+                const tb = document.getElementById('table-campi');
+                if (!campi.length) { tb.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center italic" style="color:var(--text-secondary)">Nessun campo</td></tr>'; return; }
+                tb.innerHTML = campi.map(c => `<tr class="transition-colors" style="hover:background:var(--surface-hover)">
+                    <td class="px-4 py-3 font-medium">${c.nome}</td>
+                    <td class="px-4 py-3" style="color:var(--text-secondary)">${c.superficie ? formatNumber(c.superficie) : '-'}</td>
+                    <td class="px-4 py-3">${c.tipo_terreno ? '<span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full" style="background:' + (window.getComputedStyle(document.body).getPropertyValue('--primary-light') || '#dcfce7') + ';color:var(--primary)">' + c.tipo_terreno + '</span>' : '-'}</td>
+                    <td class="px-4 py-3" style="color:var(--text-secondary)">${c.note || '-'}</td>
+                    <td class="px-4 py-3"><div class="flex gap-2">
+                        <button class="text-sm font-medium hover:underline transition-colors" style="color:var(--primary)" onclick="editCampo('${c._id}')">Modifica</button>
+                        <button class="text-sm font-medium hover:underline transition-colors" style="color:var(--danger)" onclick="deleteCampo('${c._id}','${c.nome.replace(/'/g,"\\'")}')">Elimina</button>
+                    </div></td>
+                </tr>`).join('');
+                setupSearch('search-campi', 'table-campi');
+            } catch(e) { console.error(e); }
         }
-
-        function displayCampi() {
-            const tbody = document.getElementById('table-campi');
-
-            if (campi.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-slate-400 italic">Nessun campo registrato</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = campi.map(campo => `
-                <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="px-4 py-3 font-medium">${campo.nome}</td>
-                    <td class="px-4 py-3 text-slate-600">${campo.superficie ? formatNumber(campo.superficie) : '-'}</td>
-                    <td class="px-4 py-3">${campo.tipo_terreno ? '<span class="inline-block bg-sky-100 text-sky-700 text-xs font-medium px-2.5 py-1 rounded-full">' + campo.tipo_terreno + '</span>' : '-'}</td>
-                    <td class="px-4 py-3 text-slate-500 max-w-xs truncate">${campo.note || '-'}</td>
-                    <td class="px-4 py-3">
-                        <div class="flex gap-2">
-                            <button class="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline transition-colors" onclick="editCampo('${campo._id}')">Modifica</button>
-                            <button class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline transition-colors" onclick="deleteCampo('${campo._id}', '${campo.nome}')">Elimina</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function openAddCampoModal() {
-            editingId = null;
-            document.getElementById('modal-title').textContent = 'Nuovo Campo';
-            document.getElementById('form-campo').reset();
-            document.getElementById('campo-id').value = '';
-            openModal('modal-campo');
-        }
-
+        function openAddCampoModal() { editingId = null; document.getElementById('modal-title').textContent = 'Nuovo Campo'; document.getElementById('form-campo').reset(); openModal('modal-campo'); }
         async function editCampo(id) {
             try {
-                const campo = await apiGet(`/campi/${id}`);
-                editingId = id;
-
+                const c = await apiGet('/campi/' + id); editingId = id;
                 document.getElementById('modal-title').textContent = 'Modifica Campo';
-                document.getElementById('campo-id').value = campo.id;
-                document.getElementById('campo-nome').value = campo.nome;
-                document.getElementById('campo-superficie').value = campo.superficie || '';
-                document.getElementById('campo-terreno').value = campo.tipo_terreno || '';
-                document.getElementById('campo-note').value = campo.note || '';
-
+                document.getElementById('campo-id').value = c.id; document.getElementById('campo-nome').value = c.nome;
+                document.getElementById('campo-superficie').value = c.superficie || '';
+                document.getElementById('campo-terreno').value = c.tipo_terreno || '';
+                document.getElementById('campo-note').value = c.note || '';
                 openModal('modal-campo');
-            } catch (error) {
-                showError('Errore nel caricamento del campo');
-            }
+            } catch(e) { showError('Errore caricamento campo'); }
         }
-
-        async function saveCampo(event) {
-            event.preventDefault();
-
-            const data = {
-                nome: document.getElementById('campo-nome').value,
-                superficie: document.getElementById('campo-superficie').value || null,
-                tipo_terreno: document.getElementById('campo-terreno').value || null,
-                note: document.getElementById('campo-note').value || null
-            };
-
+        async function saveCampo(e) {
+            e.preventDefault();
+            const d = { nome: document.getElementById('campo-nome').value, superficie: document.getElementById('campo-superficie').value || null, tipo_terreno: document.getElementById('campo-terreno').value || null, note: document.getElementById('campo-note').value || null };
             try {
-                if (editingId) {
-                    await apiPut(`/campi/${editingId}`, data);
-                    showSuccess('Campo aggiornato con successo');
-                } else {
-                    await apiPost('/campi', data);
-                    showSuccess('Campo creato con successo');
-                }
-
-                closeModal('modal-campo');
-                loadCampi();
-            } catch (error) {
-                showError(error.message || 'Errore nel salvataggio del campo');
-            }
+                if (editingId) { await apiPut('/campi/' + editingId, d); showSuccess('Campo aggiornato'); }
+                else { await apiPost('/campi', d); showSuccess('Campo creato'); }
+                closeModal('modal-campo'); loadCampi();
+            } catch(e) { showError(e.message); }
         }
-
         async function deleteCampo(id, nome) {
-            if (!confirmAction('Sei sicuro di voler eliminare il campo "' + nome + '"?\n\nATTENZIONE: Verranno eliminate anche tutte le coltivazioni e attività associate.')) {
-                return;
-            }
-
-            try {
-                await apiDelete('/campi/' + id);
-                showSuccess('Campo eliminato con successo');
-                loadCampi();
-            } catch (error) {
-                showError(error.message || 'Errore nell\'eliminazione del campo');
-            }
+            if (!confirmAction('Eliminare "' + nome + '"? Verranno eliminate anche coltivazioni e attività.')) return;
+            try { await apiDelete('/campi/' + id); showSuccess('Eliminato'); loadCampi(); } catch(e) { showError(e.message); }
         }
-
         document.addEventListener('DOMContentLoaded', loadCampi);
     </script>
 </body>
