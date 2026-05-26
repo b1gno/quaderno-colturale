@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="min-h-screen font-sans antialiased">
+    <!-- Barra di navigazione principale con link a tutte le sezioni -->
     <nav class="bg-emerald-700 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -28,7 +29,7 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h2 class="text-2xl font-bold mb-6 pb-2 border-b-3" style="color:var(--primary);border-color:var(--primary)">Dashboard</h2>
 
-        <!-- Stats -->
+        <!-- Sezione statistiche: 4 card riassuntive (campi, coltivazioni, prodotti, sotto scorta) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <div class="rounded-xl shadow-sm border-l-4 p-5" style="background:var(--surface);border-left-color:var(--primary)">
                 <p class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--text-secondary)">Campi Attivi</p>
@@ -48,7 +49,7 @@
             </div>
         </div>
 
-        <!-- Charts -->
+        <!-- Sezione grafici: coltivazioni per campo e distribuzione categorie prodotti -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <div class="rounded-xl shadow-sm p-5" style="background:var(--surface)">
                 <h3 class="text-sm font-semibold mb-4" style="color:var(--text)">📊 Coltivazioni per Campo</h3>
@@ -60,7 +61,7 @@
             </div>
         </div>
 
-        <!-- Sotto scorta -->
+        <!-- Tabella prodotti con quantità inferiore alla scorta minima (visibile solo se ci sono) -->
         <div id="section-sotto-scorta" class="rounded-xl shadow-sm p-6 mb-8 hidden" style="background:var(--surface)">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold" style="color:var(--danger)">⚠️ Prodotti Sotto Scorta</h3>
@@ -76,7 +77,7 @@
             </div>
         </div>
 
-        <!-- Previsioni esaurimento -->
+        <!-- Tabella previsioni esaurimento scorte (prodotti che finiranno entro 30 giorni) -->
         <div id="section-previsioni" class="rounded-xl shadow-sm p-6 mb-8 hidden" style="background:var(--surface)">
             <h3 class="text-lg font-semibold mb-4" style="color:var(--text)">📈 Previsioni Esaurimento Scorte</h3>
             <div class="overflow-x-auto">
@@ -89,7 +90,7 @@
             </div>
         </div>
 
-        <!-- Ultime attività -->
+        <!-- Tabella delle ultime 5 attività registrate in azienda -->
         <div class="rounded-xl shadow-sm p-6" style="background:var(--surface)">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold" style="color:var(--text)">📋 Ultime Attività</h3>
@@ -110,6 +111,7 @@
 
     <script src="js/app.js"></script>
     <script>
+        // Carica tutti i dati della dashboard: statistiche, prodotti sotto scorta, previsioni, ultime attività e grafici
         async function loadDashboard() {
             try {
                 const [campi, coltivazioni, prodotti, magazzino] = await Promise.all([
@@ -178,6 +180,7 @@
             }
         }
 
+        // Crea i grafici Chart.js: barre (coltivazioni per campo) e doughnut (categorie prodotti)
         function drawCharts(campi, coltivazioni, prodotti) {
             // Coltivazioni per campo
             const ctx1 = document.getElementById('chart-coltivazioni')?.getContext('2d');
@@ -215,6 +218,7 @@
             }
         }
 
+        // All'avvio della pagina, carica i dati della dashboard
         document.addEventListener('DOMContentLoaded', loadDashboard);
     </script>
 </body>

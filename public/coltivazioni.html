@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pagina di gestione delle coltivazioni -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="min-h-screen font-sans antialiased">
+    <!-- Navigazione principale -->
     <nav class="bg-emerald-700 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -24,6 +26,7 @@
         </div>
     </nav>
 
+    <!-- Contenuto principale: titolo, pulsanti e tabella coltivazioni -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
             <h2 class="text-2xl font-bold" style="color:var(--primary)">Gestione Coltivazioni</h2>
@@ -34,6 +37,7 @@
         </div>
 
         <div class="rounded-xl shadow-sm overflow-hidden" style="background:var(--surface)">
+            <!-- Filtro di ricerca per la tabella -->
             <div class="p-4 border-b" style="border-color:var(--border)">
                 <input id="search-coltivazioni" type="text" placeholder="🔍 Cerca coltivazioni..." class="w-full sm:w-64 px-3 py-2 rounded-lg text-sm outline-none transition-shadow" style="background:var(--bg);color:var(--text);border:1px solid var(--border)">
             </div>
@@ -44,6 +48,7 @@
                         <th class="px-4 py-3 text-left font-semibold">Data Semina</th><th class="px-4 py-3 text-left font-semibold">Periodo</th>
                         <th class="px-4 py-3 text-left font-semibold">Stato</th><th class="px-4 py-3 text-left font-semibold">Azioni</th>
                     </tr></thead>
+                    <!-- Tabella popolata dinamicamente da loadData() -->
                     <tbody id="table-coltivazioni" class="divide-y" style="border-color:var(--border)">
                         <tr><td colspan="6" class="px-4 py-6 text-center italic" style="color:var(--text-secondary)">Caricamento...</td></tr>
                     </tbody>
@@ -52,16 +57,19 @@
         </div>
     </main>
 
+    <!-- Modal per creazione/modifica di una coltivazione -->
     <div id="modal-coltivazione" class="modal">
         <div class="modal-content rounded-xl shadow-2xl p-6" style="background:var(--surface)">
             <div class="flex items-center justify-between mb-6">
                 <h3 id="modal-title" class="text-lg font-bold" style="color:var(--text)">Nuova Coltivazione</h3>
                 <button class="text-2xl leading-none transition-colors" style="color:var(--text-secondary)" onclick="closeModal('modal-coltivazione')">&times;</button>
             </div>
+            <!-- Form: campo (select), tipo coltura, data, periodo, stato -->
             <form id="form-coltivazione" onsubmit="saveColtivazione(event)">
                 <input type="hidden" id="coltivazione-id">
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-1" style="color:var(--text)">Campo *</label>
+                    <!-- Popolato dinamicamente da populateSelect() -->
                     <select id="coltivazione-campo" required class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></select>
                 </div>
                 <div class="mb-4">
@@ -98,7 +106,9 @@
 
     <script src="js/app.js"></script>
     <script>
+        // Variabili di stato: coltivazioni, campi per la select, ID in modifica
         let coltivazioni = [], campi = [], editingId = null;
+        // Carica in parallelo coltivazioni e campi, poi popola tabella e select
         async function loadData() {
             try {
                 [coltivazioni, campi] = await Promise.all([apiGet('/coltivazioni'), apiGet('/campi')]);
@@ -118,11 +128,14 @@
                         </div></td>
                     </tr>`).join('');
                 }
+                // Popola la select dei campi nella modale
                 populateSelect('coltivazione-campo', campi, '_id', 'nome');
                 setupSearch('search-coltivazioni', 'table-coltivazioni');
             } catch(e) { console.error(e); }
         }
+        // Apre la modale per creare una nuova coltivazione
         function openAddColtivazioneModal() { editingId = null; document.getElementById('modal-title').textContent = 'Nuova Coltivazione'; document.getElementById('form-coltivazione').reset(); openModal('modal-coltivazione'); }
+        // Carica i dati della coltivazione da modificare e popola la modale
         async function editColtivazione(id) {
             try {
                 const c = await apiGet('/coltivazioni/' + id); editingId = id;
@@ -133,6 +146,7 @@
                 openModal('modal-coltivazione');
             } catch(e) { showError('Errore caricamento'); }
         }
+        // Salva (crea o aggiorna) una coltivazione tramite API
         async function saveColtivazione(e) {
             e.preventDefault();
             const d = { id_campo: document.getElementById('coltivazione-campo').value, tipo_coltura: document.getElementById('coltivazione-tipo').value, data_semina: document.getElementById('coltivazione-data').value || null, periodo: document.getElementById('coltivazione-periodo').value || null, stato: document.getElementById('coltivazione-stato').value };
@@ -142,7 +156,9 @@
                 closeModal('modal-coltivazione'); loadData();
             } catch(e) { showError(e.message); }
         }
+        // Elimina una coltivazione dopo conferma
         async function deleteColtivazione(id, tipo) { if (!confirmAction('Eliminare "' + tipo + '"?')) return; try { await apiDelete('/coltivazioni/' + id); showSuccess('Eliminata'); loadData(); } catch(e) { showError(e.message); } }
+        // All'avvio carica i dati
         document.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>

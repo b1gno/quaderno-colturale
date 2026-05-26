@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pagina di gestione dei campi agricoli -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="min-h-screen font-sans antialiased">
+    <!-- Navigazione principale con link a tutte le sezioni -->
     <nav class="bg-emerald-700 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -24,6 +26,7 @@
         </div>
     </nav>
 
+    <!-- Contenuto principale: titolo, pulsanti e tabella campi -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
             <h2 class="text-2xl font-bold" style="color:var(--primary)">Gestione Campi</h2>
@@ -35,9 +38,11 @@
 
         <div class="rounded-xl shadow-sm overflow-hidden" style="background:var(--surface)">
             <div class="p-4 border-b" style="border-color:var(--border)">
+                <!-- Filtro di ricerca testuale per la tabella -->
                 <input id="search-campi" type="text" placeholder="🔍 Cerca campi..." class="w-full sm:w-64 px-3 py-2 rounded-lg text-sm outline-none transition-shadow" style="background:var(--bg);color:var(--text);border:1px solid var(--border);focus:ring:2;focus:ring:var(--primary)">
             </div>
             <div class="overflow-x-auto">
+                <!-- Tabella riepilogativa di tutti i campi -->
                 <table class="w-full text-sm">
                     <thead><tr style="background:#059669;color:white">
                         <th class="px-4 py-3 text-left font-semibold">Nome</th><th class="px-4 py-3 text-left font-semibold">Superficie (ha)</th>
@@ -45,6 +50,7 @@
                         <th class="px-4 py-3 text-left font-semibold">Azioni</th>
                     </tr></thead>
                     <tbody id="table-campi" class="divide-y" style="border-color:var(--border)">
+                        <!-- Righe popolate dinamicamente da loadCampi() -->
                         <tr><td colspan="5" class="px-4 py-6 text-center italic" style="color:var(--text-secondary)">Caricamento...</td></tr>
                     </tbody>
                 </table>
@@ -52,13 +58,14 @@
         </div>
     </main>
 
-    <!-- Modal -->
+    <!-- Modal per creazione/modifica di un campo -->
     <div id="modal-campo" class="modal">
         <div class="modal-content rounded-xl shadow-2xl p-6" style="background:var(--surface)">
             <div class="flex items-center justify-between mb-6">
                 <h3 id="modal-title" class="text-lg font-bold" style="color:var(--text)">Nuovo Campo</h3>
                 <button class="text-2xl leading-none transition-colors" style="color:var(--text-secondary)" onclick="closeModal('modal-campo')">&times;</button>
             </div>
+            <!-- Form con campi: nome, superficie, tipo terreno, note -->
             <form id="form-campo" onsubmit="saveCampo(event)">
                 <input type="hidden" id="campo-id">
                 <div class="mb-4">
@@ -93,7 +100,9 @@
 
     <script src="js/app.js"></script>
     <script>
+        // Variabili di stato: elenco campi e ID in fase di modifica
         let campi = [], editingId = null;
+        // Carica tutti i campi dal backend e popola la tabella
         async function loadCampi() {
             try {
                 campi = await apiGet('/campi');
@@ -109,10 +118,13 @@
                         <button class="text-sm font-medium hover:underline transition-colors" style="color:var(--danger)" onclick="deleteCampo('${c._id}','${c.nome.replace(/'/g,"\\'")}')">Elimina</button>
                     </div></td>
                 </tr>`).join('');
+                // Abilita la ricerca client-side sulla tabella
                 setupSearch('search-campi', 'table-campi');
             } catch(e) { console.error(e); }
         }
+        // Apre la modale in modalità "creazione" (resetta il form)
         function openAddCampoModal() { editingId = null; document.getElementById('modal-title').textContent = 'Nuovo Campo'; document.getElementById('form-campo').reset(); openModal('modal-campo'); }
+        // Recupera i dati del campo da modificare e popola la modale
         async function editCampo(id) {
             try {
                 const c = await apiGet('/campi/' + id); editingId = id;
@@ -124,6 +136,7 @@
                 openModal('modal-campo');
             } catch(e) { showError('Errore caricamento campo'); }
         }
+        // Salva (crea o aggiorna) un campo tramite API POST/PUT
         async function saveCampo(e) {
             e.preventDefault();
             const d = { nome: document.getElementById('campo-nome').value, superficie: document.getElementById('campo-superficie').value || null, tipo_terreno: document.getElementById('campo-terreno').value || null, note: document.getElementById('campo-note').value || null };
@@ -133,10 +146,12 @@
                 closeModal('modal-campo'); loadCampi();
             } catch(e) { showError(e.message); }
         }
+        // Elimina un campo dopo conferma utente
         async function deleteCampo(id, nome) {
             if (!confirmAction('Eliminare "' + nome + '"? Verranno eliminate anche coltivazioni e attività.')) return;
             try { await apiDelete('/campi/' + id); showSuccess('Eliminato'); loadCampi(); } catch(e) { showError(e.message); }
         }
+        // All'avvio carica la lista campi
         document.addEventListener('DOMContentLoaded', loadCampi);
     </script>
 </body>

@@ -7,11 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
     <script>
+        // Se l'utente è già autenticato, salta la pagina di login e va direttamente alla dashboard
         if (localStorage.getItem('token')) location.href = 'index.html';
     </script>
 </head>
 <body class="bg-gradient-to-br from-emerald-600 via-emerald-700 to-green-800 min-h-screen flex items-center justify-center px-4 font-sans">
     <div class="w-full max-w-md">
+        <!-- Logo e titolo dell'applicazione -->
         <div class="text-center mb-8">
             <div class="text-5xl mb-2">🌾</div>
             <h1 class="text-3xl font-bold text-white">Quaderno di Campo</h1>
@@ -19,13 +21,13 @@
         </div>
 
         <div class="bg-white rounded-2xl shadow-2xl p-8">
-            <!-- Tab -->
+            <!-- Tab di navigazione tra form Accedi e Registrati -->
             <div class="flex mb-6 bg-slate-100 rounded-lg p-1">
                 <button id="tab-login" class="flex-1 py-2 text-sm font-medium rounded-md bg-white shadow-sm transition-all" onclick="showTab('login')">Accedi</button>
                 <button id="tab-register" class="flex-1 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors" onclick="showTab('register')">Registrati</button>
             </div>
 
-            <!-- Login -->
+            <!-- Form di accesso (email + password) -->
             <div id="form-login">
                 <h2 class="text-xl font-bold text-slate-800 mb-1">Bentornato</h2>
                 <p class="text-sm text-slate-500 mb-6">Accedi al tuo account</p>
@@ -45,7 +47,7 @@
                 </form>
             </div>
 
-            <!-- Register -->
+            <!-- Form di registrazione (nome, email, password) -->
             <div id="form-register" class="hidden">
                 <h2 class="text-xl font-bold text-slate-800 mb-1">Crea Account</h2>
                 <p class="text-sm text-slate-500 mb-6">Registrati per iniziare</p>
@@ -74,6 +76,7 @@
     </div>
 
     <script>
+        // Alterna la visualizzazione tra form login e registrazione, aggiornando lo stile dei tab
         function showTab(tab) {
             document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
             document.getElementById('form-register').classList.toggle('hidden', tab !== 'register');
@@ -81,12 +84,14 @@
             document.getElementById('tab-register').className = 'flex-1 py-2 text-sm font-medium rounded-md' + (tab === 'register' ? ' bg-white shadow-sm' : ' text-slate-500 hover:text-slate-700') + ' transition-all';
         }
 
+        // Mostra un messaggio di errore in un elemento HTML (rimuove la classe 'hidden')
         function showError(id, msg) {
             const el = document.getElementById(id);
             el.textContent = msg;
             el.classList.remove('hidden');
         }
 
+        // Invia la richiesta di login all'API; in caso di successo salva token e reindirizza alla dashboard
         async function handleLogin(e) {
             e.preventDefault();
             document.getElementById('login-error').classList.add('hidden');
@@ -106,6 +111,7 @@
             }
         }
 
+        // Invia la richiesta di registrazione all'API; in caso di successo salva token e reindirizza alla dashboard
         async function handleRegister(e) {
             e.preventDefault();
             document.getElementById('register-error').classList.add('hidden');

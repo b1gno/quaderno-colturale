@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pagina calendario con vista mensile e drag & drop delle attività -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="min-h-screen font-sans antialiased">
+    <!-- Navigazione principale -->
     <nav class="bg-emerald-700 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -29,42 +31,47 @@
             <h2 class="text-2xl font-bold" style="color:var(--primary)">📅 Calendario Attività</h2>
         </div>
 
-        <div class="rounded-xl shadow-sm overflow-hidden" style="background:var(--surface)">
-            <div class="flex items-center justify-between p-4 border-b" style="border-color:var(--border)">
-                <button onclick="prevMonth()" class="px-4 py-2 text-sm font-medium rounded-lg transition-colors" style="background:var(--surface-hover);color:var(--text)">← Mese Prec.</button>
-                <h3 id="calendar-title" class="text-lg font-bold" style="color:var(--text)">Mese Anno</h3>
-                <button onclick="nextMonth()" class="px-4 py-2 text-sm font-medium rounded-lg transition-colors" style="background:var(--surface-hover);color:var(--text)">Mese Succ. →</button>
-            </div>
-            <div class="p-4">
-                <div class="calendar-grid text-center">
-                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Lun</div>
-                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Mar</div>
-                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Mer</div>
-                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Gio</div>
-                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Ven</div>
-                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Sab</div>
-                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Dom</div>
+            <!-- Calendario a griglia con navigazione mesi e giorni con eventi -->
+            <div class="rounded-xl shadow-sm overflow-hidden" style="background:var(--surface)">
+                <div class="flex items-center justify-between p-4 border-b" style="border-color:var(--border)">
+                    <button onclick="prevMonth()" class="px-4 py-2 text-sm font-medium rounded-lg transition-colors" style="background:var(--surface-hover);color:var(--text)">← Mese Prec.</button>
+                    <h3 id="calendar-title" class="text-lg font-bold" style="color:var(--text)">Mese Anno</h3>
+                    <button onclick="nextMonth()" class="px-4 py-2 text-sm font-medium rounded-lg transition-colors" style="background:var(--surface-hover);color:var(--text)">Mese Succ. →</button>
                 </div>
-                <div id="calendar-grid" class="calendar-grid mt-1"></div>
+                <!-- Griglia calendario con intestazione giorni della settimana -->
+                <div class="p-4">
+                    <div class="calendar-grid text-center">
+                        <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Lun</div>
+                        <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Mar</div>
+                        <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Mer</div>
+                        <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Gio</div>
+                        <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Ven</div>
+                        <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Sab</div>
+                        <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Dom</div>
+                    </div>
+                    <!-- Celle popolate dinamicamente da renderCalendar() -->
+                    <div id="calendar-grid" class="calendar-grid mt-1"></div>
+                </div>
             </div>
-        </div>
 
-        <div class="rounded-xl shadow-sm p-4 mt-6" style="background:var(--surface)">
-            <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-semibold" style="color:var(--text)">📋 Attività del <span id="selected-date-label">seleziona un giorno</span></h4>
-                <button onclick="openQuickAdd()" class="text-sm font-medium px-3 py-1.5 rounded-lg text-white shadow-sm transition-colors" style="background:var(--primary)" id="btn-quick-add" disabled>+ Aggiungi</button>
+            <!-- Pannello attività del giorno selezionato con drag & drop -->
+            <div class="rounded-xl shadow-sm p-4 mt-6" style="background:var(--surface)">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="text-sm font-semibold" style="color:var(--text)">📋 Attività del <span id="selected-date-label">seleziona un giorno</span></h4>
+                    <button onclick="openQuickAdd()" class="text-sm font-medium px-3 py-1.5 rounded-lg text-white shadow-sm transition-colors" style="background:var(--primary)" id="btn-quick-add" disabled>+ Aggiungi</button>
+                </div>
+                <div id="day-events" class="text-sm italic" style="color:var(--text-secondary)">Clicca un giorno per vedere le attività</div>
             </div>
-            <div id="day-events" class="text-sm italic" style="color:var(--text-secondary)">Clicca un giorno per vedere le attività</div>
-        </div>
     </main>
 
-    <!-- Modal Quick Add -->
+    <!-- Modal per aggiunta rapida attività su un giorno specifico -->
     <div id="modal-quick-add" class="modal">
         <div class="modal-content rounded-xl shadow-2xl p-6" style="background:var(--surface)">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-bold" style="color:var(--text)">Nuova Attività per <span id="quick-add-date"></span></h3>
                 <button class="text-2xl leading-none transition-colors" style="color:var(--text-secondary)" onclick="closeModal('modal-quick-add')">&times;</button>
             </div>
+            <!-- Form rapido: campo, tipo attività e descrizione -->
             <form id="form-quick-add" onsubmit="saveQuickAdd(event)">
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-1" style="color:var(--text)">Campo *</label>
@@ -97,7 +104,7 @@
         </div>
     </div>
 
-    <!-- Modal Sposta -->
+    <!-- Modal di conferma per spostare un'attività tramite drag & drop -->
     <div id="modal-sposta" class="modal">
         <div class="modal-content rounded-xl shadow-2xl p-6" style="background:var(--surface); max-width: 400px;">
             <div class="flex items-center justify-between mb-6">
@@ -115,19 +122,23 @@
 
     <script src="js/app.js"></script>
     <script>
+        // Variabili di stato: data corrente, giorno selezionato, eventi, campi, dati sposta
         let currentDate = new Date();
         let selectedDate = null;
         let allEvents = [];
         let campi = [];
         let spostaData = null;
 
+        // Costanti per nomi mesi e giorni
         const MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
         const DAYS = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
 
+        // Carica l'elenco dei campi per la select nella modale quick-add
         async function loadCampi() {
             try { campi = await apiGet('/campi'); } catch(e) { console.error(e); }
         }
 
+        // Carica tutte le attività e rigenera il calendario
         async function loadEvents() {
             try {
                 allEvents = await apiGet('/attivita');
@@ -135,6 +146,7 @@
             } catch(e) { console.error(e); }
         }
 
+        // Disegna la griglia del calendario: giorni mese precedente, corrente e successivo
         function renderCalendar() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
@@ -144,24 +156,24 @@
             grid.innerHTML = '';
 
             const firstDay = new Date(year, month, 1);
-            const startOffset = (firstDay.getDay() + 6) % 7; // lun=0
+            const startOffset = (firstDay.getDay() + 6) % 7; // Lunedì = 0
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const daysInPrev = new Date(year, month, 0).getDate();
             const today = new Date();
 
-            // Days from previous month
+            // Giorni del mese precedente per riempire la prima settimana
             for (let i = startOffset - 1; i >= 0; i--) {
                 const d = daysInPrev - i;
                 grid.appendChild(createDayCell(year, month - 1, d, true));
             }
 
-            // Current month days
+            // Giorni del mese corrente
             for (let d = 1; d <= daysInMonth; d++) {
                 const isToday = year === today.getFullYear() && month === today.getMonth() && d === today.getDate();
                 grid.appendChild(createDayCell(year, month, d, false, isToday));
             }
 
-            // Remaining cells to fill last week
+            // Celle rimanenti per completare l'ultima riga della griglia
             const totalCells = startOffset + daysInMonth;
             const remaining = (7 - (totalCells % 7)) % 7;
             for (let d = 1; d <= remaining; d++) {
@@ -169,12 +181,14 @@
             }
         }
 
+        // Crea una singola cella del calendario con numero, pallini eventi e supporto drag & drop
         function createDayCell(year, month, day, otherMonth, isToday) {
             const div = document.createElement('div');
             div.className = 'calendar-day' + (otherMonth ? ' other-month' : '') + (isToday ? ' today' : '');
 
             const dateStr = fmtISO(year, month, day);
 
+            // Filtra eventi che cadono in questo giorno
             const events = allEvents.filter(e => {
                 if (!e.data) return false;
                 const ed = new Date(e.data);
@@ -183,12 +197,12 @@
 
             if (events.length > 0) div.classList.add('has-event');
 
-            // Day number
+            // Numero del giorno
             const span = document.createElement('span');
             span.textContent = day;
             div.appendChild(span);
 
-            // Dots
+            // Pallini indicatore eventi (max 3 + "+N")
             if (events.length > 0) {
                 const dots = document.createElement('div');
                 dots.style.display = 'flex';
@@ -211,10 +225,10 @@
                 div.appendChild(dots);
             }
 
-            // Click to show events
+            // Click per selezionare il giorno e vedere le attività
             div.addEventListener('click', () => selectDay(dateStr));
 
-            // Drop target
+            // Eventi drag & drop per spostare attività tra giorni
             div.addEventListener('dragover', (e) => { e.preventDefault(); div.style.background = 'var(--surface-hover)'; });
             div.addEventListener('dragleave', () => { div.style.background = ''; });
             div.addEventListener('drop', (e) => {
@@ -235,6 +249,7 @@
             return div;
         }
 
+        // Seleziona un giorno: mostra le attività e abilita il pulsante "Aggiungi"
         function selectDay(dateStr) {
             selectedDate = dateStr;
             document.getElementById('selected-date-label').textContent = formatDate(dateStr);
@@ -252,6 +267,7 @@
                 return;
             }
 
+            // Mostra card attività trascinabili per il giorno selezionato
             container.innerHTML = '';
             events.forEach(e => {
                 const card = document.createElement('div');
@@ -278,6 +294,7 @@
             });
         }
 
+        // Conferma lo spostamento di un'attività tramite API PUT
         async function confirmSposta() {
             try {
                 await apiPut('/attivita/' + spostaData.id, { data: spostaData.newDate });
@@ -288,15 +305,18 @@
             } catch(e) { showError(e.message); }
         }
 
+        // Elimina attività dal calendario con conferma
         async function deleteFromCalendar(id, event) {
             event.stopPropagation();
             if (!confirmAction('Eliminare questa attività?')) return;
             try { await apiDelete('/attivita/' + id); showSuccess('Eliminata'); loadEvents(); if (selectedDate) selectDay(selectedDate); } catch(e) { showError(e.message); }
         }
 
+        // Navigazione mesi
         function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
         function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }
 
+        // Apre modale per aggiunta rapida attività sul giorno selezionato
         function openQuickAdd() {
             if (!selectedDate) return;
             document.getElementById('quick-add-date').textContent = formatDate(selectedDate);
@@ -307,6 +327,7 @@
             openModal('modal-quick-add');
         }
 
+        // Salva una nuova attività creata dalla modale quick-add
         async function saveQuickAdd(e) {
             e.preventDefault();
             const data = {
@@ -318,10 +339,12 @@
             try { await apiPost('/attivita', data); showSuccess('Attività creata'); closeModal('modal-quick-add'); loadEvents(); if (selectedDate) selectDay(selectedDate); } catch(e) { showError(e.message); }
         }
 
+        // Formatta data in ISO (YYYY-MM-DD)
         function fmtISO(year, month, day) {
             return year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
         }
 
+        // All'avvio carica campi ed eventi
         document.addEventListener('DOMContentLoaded', async () => {
             await loadCampi();
             await loadEvents();

@@ -1,4 +1,4 @@
-/* ===== Tema chiaro (default) ===== */
+/* ===== Variabili tema chiaro (default) — sfondo, superficie, testo, colori primari ===== */
 :root {
   --bg: #f8fafc;
   --surface: #ffffff;
@@ -13,7 +13,7 @@
   --chart-bg: #ffffff;
 }
 
-/* ===== Tema scuro ===== */
+/* ===== Variabili tema scuro — sovrascrive :root quando il tag <html> ha classe .dark ===== */
 html.dark {
   --bg: #0f172a;
   --surface: #1e293b;
@@ -28,16 +28,17 @@ html.dark {
   --chart-bg: #1e293b;
 }
 
+/* Stili base del body — sfondo e testo dinamici in base al tema */
 body {
   background: var(--bg);
   color: var(--text);
   transition: background 0.3s, color 0.3s;
 }
 
-/* Navbar colori fissi (verde sempre uguale) */
+/* Navbar — colore fisso invariato dal tema */
 nav.bg-emerald-700 { background-color: #047857 !important; }
 
-/* Card, sezioni, tabelle */
+/* Card, sezioni e tabelle — si adattano al tema corrente */
 .bg-white, .bg-slate-50, .bg-slate-100 { background-color: var(--surface) !important; }
 .text-slate-800, .text-slate-700, .text-slate-600, .text-slate-500, .text-slate-400 { color: var(--text) !important; }
 .text-slate-500, .text-slate-400 { color: var(--text-secondary) !important; }
@@ -45,23 +46,23 @@ nav.bg-emerald-700 { background-color: #047857 !important; }
 .hover\:bg-slate-50:hover { background-color: var(--surface-hover) !important; }
 .bg-slate-100 { background-color: var(--surface-hover) !important; }
 
-/* Modal */
+/* Modal — contenuto adattato al tema */
 .modal-content.bg-white { background-color: var(--surface) !important; }
 
-/* Badge */
+/* Badge e indicatori di stato */
 .bg-emerald-100 { background-color: var(--primary-light) !important; }
 .text-emerald-700 { color: var(--primary) !important; }
 
-/* Tabella header */
+/* Tabella — header riga campi */
 tr.bg-emerald-600 { background-color: #059669 !important; }
 
-/* Chart bg */
+/* Grafico Chart.js — sfondo trasparente per adattarsi al tema */
 .chart-container canvas { background: transparent !important; }
 
-/* Search input */
+/* Input di ricerca — colore focus legato al tema */
 .search-input:focus { ring-color: var(--primary); }
 
-/* ===== Modal overlay (sempre uguale) ===== */
+/* ===== Modal overlay — sfondo scuro con sfocatura, sempre uguale in entrambi i temi ===== */
 .modal {
   display: none;
   position: fixed;
@@ -73,6 +74,7 @@ tr.bg-emerald-600 { background-color: #059669 !important; }
   backdrop-filter: blur(2px);
 }
 .modal.active { display: flex; }
+/* Contenitore della modale — larghezza massima 600px, scroll verticale se necessario */
 .modal-content {
   max-width: 600px;
   width: 90%;
@@ -80,12 +82,14 @@ tr.bg-emerald-600 { background-color: #059669 !important; }
   overflow-y: auto;
 }
 
-/* ===== Calendario ===== */
+/* ===== Calendario — griglia 7 colonne (giorni della settimana) ===== */
+/* Griglia del calendario: 7 colonne (lun-dom), gap 2px tra celle */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 2px;
 }
+/* Singolo giorno del calendario — formato quadrato con aspect-ratio 1:1 */
 .calendar-day {
   aspect-ratio: 1;
   display: flex;
@@ -97,7 +101,11 @@ tr.bg-emerald-600 { background-color: #059669 !important; }
   cursor: default;
   position: relative;
 }
+/* Giorno con eventi — sfondo evidenziato con il colore primario */
 .calendar-day.has-event { background: var(--primary-light); font-weight: 600; }
+/* Giorno corrente — bordo evidenziato con il colore primario */
 .calendar-day.today { border: 2px solid var(--primary); }
+/* Giorni dei mesi precedente/successivo — opacità ridotta */
 .calendar-day.other-month { opacity: 0.3; }
+/* Pallino indicatore di evento sotto il numero del giorno */
 .calendar-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--primary); margin-top: 2px; }

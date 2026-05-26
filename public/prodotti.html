@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pagina di gestione del magazzino (prodotti, movimenti, previsioni) -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="min-h-screen font-sans antialiased">
+    <!-- Navigazione principale -->
     <nav class="bg-emerald-700 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -34,7 +36,7 @@
             </div>
         </div>
 
-        <!-- Prodotti -->
+        <!-- Sezione prodotti in magazzino con tabella, stato scorta e azioni -->
         <div class="rounded-xl shadow-sm p-6 mb-8" style="background:var(--surface)">
             <h3 class="text-lg font-semibold mb-4" style="color:var(--text)">Prodotti in Magazzino</h3>
             <div class="mb-4"><input id="search-prodotti" type="text" placeholder="🔍 Cerca prodotti..." class="w-full sm:w-64 px-3 py-2 rounded-lg text-sm outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></div>
@@ -49,7 +51,7 @@
             </div>
         </div>
 
-        <!-- Previsioni -->
+        <!-- Sezione previsioni esaurimento: mostra i prodotti che finiranno entro 30 giorni -->
         <div id="section-previsioni" class="rounded-xl shadow-sm p-6 mb-8 hidden" style="background:var(--surface)">
             <h3 class="text-lg font-semibold mb-4" style="color:var(--text)">📈 Previsioni Esaurimento</h3>
             <div class="overflow-x-auto">
@@ -62,7 +64,7 @@
             </div>
         </div>
 
-        <!-- Movimenti -->
+        <!-- Sezione ultimi movimenti di carico/scarico -->
         <div class="rounded-xl shadow-sm p-6" style="background:var(--surface)">
             <h3 class="text-lg font-semibold mb-4" style="color:var(--text)">Ultimi Movimenti</h3>
             <div class="mb-4"><input id="search-movimenti" type="text" placeholder="🔍 Cerca movimenti..." class="w-full sm:w-64 px-3 py-2 rounded-lg text-sm outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></div>
@@ -78,7 +80,7 @@
         </div>
     </main>
 
-    <!-- Modal Prodotto -->
+    <!-- Modal per creazione/modifica di un prodotto (nome, categoria, unità, quantità, scorta) -->
     <div id="modal-prodotto" class="modal">
         <div class="modal-content rounded-xl shadow-2xl p-6" style="background:var(--surface)">
             <div class="flex items-center justify-between mb-6"><h3 id="modal-title-prodotto" class="text-lg font-bold" style="color:var(--text)">Nuovo Prodotto</h3><button class="text-2xl" style="color:var(--text-secondary)" onclick="closeModal('modal-prodotto')">&times;</button></div>
@@ -101,7 +103,7 @@
         </div>
     </div>
 
-    <!-- Modal Carico -->
+    <!-- Modal per registrare un carico di magazzino (prodotto, quantità, note) -->
     <div id="modal-carico" class="modal">
         <div class="modal-content rounded-xl shadow-2xl p-6" style="background:var(--surface)">
             <div class="flex items-center justify-between mb-6"><h3 class="text-lg font-bold" style="color:var(--text)">Registra Carico</h3><button class="text-2xl" style="color:var(--text-secondary)" onclick="closeModal('modal-carico')">&times;</button></div>
@@ -119,8 +121,11 @@
 
     <script src="js/app.js"></script>
     <script>
+        // Variabili di stato: lista prodotti e ID in modifica
         let prodotti = [], editingId = null;
+        // Carica prodotti, movimenti e previsioni in parallelo
         async function loadData() { await Promise.all([loadProdotti(), loadMovimenti(), loadPrevisioni()]); }
+        // Recupera i prodotti dal backend e popola la tabella con stato scorta
         async function loadProdotti() {
             try {
                 prodotti = await apiGet('/prodotti');
@@ -138,10 +143,12 @@
                         <button class="text-sm font-medium hover:underline" style="color:var(--danger)" onclick="deleteProdotto('${p._id}','${p.nome.replace(/'/g,"\\'")}')">Elimina</button>
                     </div></td>
                 </tr>`; }).join('');
+                // Popola la select per la modale carico
                 populateSelect('carico-prodotto', prodotti, '_id', 'nome');
                 setupSearch('search-prodotti', 'table-prodotti');
             } catch(e) { console.error(e); }
         }
+        // Recupera e mostra gli ultimi 20 movimenti di magazzino
         async function loadMovimenti() {
             try {
                 const m = await apiGet('/magazzino/movimenti');
@@ -157,6 +164,7 @@
                     setupSearch('search-movimenti', 'table-movimenti');
             } catch(e) { console.error(e); }
         }
+        // Calcola e mostra la previsione di esaurimento per prodotti critici (&lt;=30gg)
         async function loadPrevisioni() {
             try {
                 const p = await apiGet('/magazzino/previsioni');
@@ -177,21 +185,28 @@
                 }).join('');
             } catch(e) { console.error(e); }
         }
+        // Apre modale per nuovo prodotto
         function openAddProdottoModal() { editingId = null; document.getElementById('modal-title-prodotto').textContent = 'Nuovo Prodotto'; document.getElementById('form-prodotto').reset(); openModal('modal-prodotto'); }
+        // Carica i dati prodotto e apre modale in modifica
         async function editProdotto(id) {
             try { const p = await apiGet('/prodotti/' + id); editingId = id; document.getElementById('modal-title-prodotto').textContent = 'Modifica Prodotto'; document.getElementById('prodotto-nome').value = p.nome; document.getElementById('prodotto-categoria').value = p.categoria; document.getElementById('prodotto-unita').value = p.unita_misura; document.getElementById('prodotto-quantita').value = p.quantita_disponibile; document.getElementById('prodotto-scorta').value = p.scorta_minima; openModal('modal-prodotto'); } catch(e) { showError('Errore'); }
         }
+        // Salva (crea o aggiorna) un prodotto
         async function saveProdotto(e) {
             e.preventDefault();
             const d = { nome: document.getElementById('prodotto-nome').value, categoria: document.getElementById('prodotto-categoria').value, unita_misura: document.getElementById('prodotto-unita').value, quantita_disponibile: parseFloat(document.getElementById('prodotto-quantita').value), scorta_minima: parseFloat(document.getElementById('prodotto-scorta').value) };
             try { if (editingId) { await apiPut('/prodotti/' + editingId, d); showSuccess('Aggiornato'); } else { await apiPost('/prodotti', d); showSuccess('Creato'); } closeModal('modal-prodotto'); loadData(); } catch(e) { showError(e.message); }
         }
+        // Elimina un prodotto dopo conferma
         async function deleteProdotto(id, nome) { if (!confirmAction('Eliminare "' + nome + '"?')) return; try { await apiDelete('/prodotti/' + id); showSuccess('Eliminato'); loadData(); } catch(e) { showError(e.message); } }
+        // Apre modale per registrare un carico
         function openCaricoModal() { document.getElementById('form-carico').reset(); openModal('modal-carico'); }
+        // Registra un carico incrementando la quantità del prodotto
         async function saveCarico(e) {
             e.preventDefault();
             try { await apiPost('/magazzino/carico', { id_prodotto: document.getElementById('carico-prodotto').value, quantita: parseFloat(document.getElementById('carico-quantita').value), note: document.getElementById('carico-note').value }); showSuccess('Carico registrato'); closeModal('modal-carico'); loadData(); } catch(e) { showError(e.message); }
         }
+        // All'avvio carica tutti i dati
         document.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>
