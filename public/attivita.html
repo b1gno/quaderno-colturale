@@ -29,15 +29,19 @@
                     <li><a href="coltivazioni.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Coltivazioni</a></li>
                     <li><a href="prodotti.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Magazzino</a></li>
                     <li><a href="attivita.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-white/20 transition-colors">Attività</a></li>
+                    <li><a href="calendario.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Calendario</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-emerald-700">Registro Attività</h2>
-            <button class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg transition-colors shadow-sm" onclick="openAddAttivitaModal()">+ Nuova Attività</button>
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <h2 class="text-2xl font-bold" style="color:var(--primary)">Registro Attività</h2>
+            <div class="flex gap-2">
+                <button onclick="openReportModal()" class="text-sm font-medium px-3 py-2 rounded-lg transition-colors" style="background:var(--surface);color:var(--text);border:1px solid var(--border)">📄 Report PDF</button>
+                <button onclick="openAddAttivitaModal()" class="text-white font-medium px-4 py-2 rounded-lg transition-colors shadow-sm" style="background:var(--primary)">+ Nuova Attività</button>
+            </div>
         </div>
 
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -130,14 +134,55 @@
         </div>
     </div>
 
+    <!-- Modal Report PDF -->
+    <div id="modal-report" class="modal">
+        <div class="modal-content rounded-xl shadow-2xl p-6" style="background:var(--surface); max-width: 450px;">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold" style="color:var(--text)">📄 Scarica Report PDF</h3>
+                <button class="text-2xl leading-none" style="color:var(--text-secondary)" onclick="closeModal('modal-report')">&times;</button>
+            </div>
+            <form id="form-report" onsubmit="scaricaPDF(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1" style="color:var(--text)">Tipo Report</label>
+                    <select id="report-tipo" onchange="toggleReportTipo()" class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)">
+                        <option value="annuale">📅 Annuale</option>
+                        <option value="mensile">📆 Mensile</option>
+                        <option value="stagionale">🌿 Stagionale</option>
+                    </select>
+                </div>
+                <div class="mb-4" id="report-anno-group">
+                    <label class="block text-sm font-medium mb-1" style="color:var(--text)">Anno</label>
+                    <select id="report-anno" class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></select>
+                </div>
+                <div class="mb-4 hidden" id="report-mese-group">
+                    <label class="block text-sm font-medium mb-1" style="color:var(--text)">Mese</label>
+                    <select id="report-mese" class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></select>
+                </div>
+                <div class="mb-4 hidden" id="report-stagione-group">
+                    <label class="block text-sm font-medium mb-1" style="color:var(--text)">Stagione</label>
+                    <select id="report-stagione" class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)">
+                        <option value="primavera">Primavera</option>
+                        <option value="estate">Estate</option>
+                        <option value="autunno">Autunno</option>
+                        <option value="inverno">Inverno</option>
+                    </select>
+                </div>
+                <div class="flex gap-3 justify-end">
+                    <button type="button" class="px-4 py-2 text-sm font-medium rounded-lg" style="background:var(--surface-hover);color:var(--text)" onclick="closeModal('modal-report')">Annulla</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white rounded-lg shadow-sm" style="background:var(--primary)">📥 Scarica PDF</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modal Dettagli -->
     <div id="modal-dettagli" class="modal">
-        <div class="modal-content bg-white rounded-xl shadow-2xl p-6">
+        <div class="modal-content rounded-xl shadow-2xl p-6" style="background:var(--surface)">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-bold text-slate-800">Dettagli Attività</h3>
-                <button class="text-slate-400 hover:text-slate-600 text-2xl leading-none transition-colors" onclick="closeModal('modal-dettagli')">&times;</button>
+                <h3 class="text-lg font-bold" style="color:var(--text)">Dettagli Attività</h3>
+                <button class="text-2xl leading-none" style="color:var(--text-secondary)" onclick="closeModal('modal-dettagli')">&times;</button>
             </div>
-            <div id="dettagli-content" class="text-sm text-slate-700 space-y-2">
+            <div id="dettagli-content" class="text-sm space-y-2" style="color:var(--text)">
             </div>
         </div>
     </div>
@@ -318,15 +363,27 @@
                 html += '<div class="flex justify-between border-b border-slate-200 pb-2"><span class="font-medium text-slate-500">Tipo:</span><span>' + (a.tipo_attivita || 'Non specificato') + '</span></div>';
                 html += '<div class="pb-2"><span class="font-medium text-slate-500">Descrizione:</span><p class="mt-1 text-slate-600">' + (a.descrizione || 'Nessuna descrizione') + '</p></div>';
 
+                if (a.meteo) {
+                    const m = a.meteo;
+                    const icon = m.codice_meteo === 0 ? '☀️' : m.codice_meteo >= 95 ? '⛈️' : m.codice_meteo >= 61 ? '🌧️' : m.codice_meteo >= 51 ? '🌦️' : m.codice_meteo >= 45 ? '🌫️' : m.codice_meteo >= 71 ? '❄️' : '☁️';
+                    html += '<h4 class="font-semibold mt-4 mb-2" style="color:var(--text)">🌤️ Meteo</h4>';
+                    html += '<div class="flex flex-wrap gap-3 p-3 rounded-lg mb-3" style="background:var(--surface-hover)">';
+                    html += '<span class="text-sm">' + icon + ' ' + (m.descrizione || '') + '</span>';
+                    if (m.temperatura_max != null) html += '<span class="text-sm">⬆️ ' + m.temperatura_max + '°C</span>';
+                    if (m.temperatura_min != null) html += '<span class="text-sm">⬇️ ' + m.temperatura_min + '°C</span>';
+                    if (m.precipitazioni != null) html += '<span class="text-sm">💧 ' + m.precipitazioni + ' mm</span>';
+                    html += '</div>';
+                }
+
                 if (a.prodotti_usati && a.prodotti_usati.length > 0) {
-                    html += '<h4 class="font-semibold text-slate-700 mt-4 mb-2">Prodotti Utilizzati:</h4>';
-                    html += '<div class="divide-y divide-slate-100 border border-slate-200 rounded-lg overflow-hidden">';
+                    html += '<h4 class="font-semibold mt-4 mb-2" style="color:var(--text)">Prodotti Utilizzati:</h4>';
+                    html += '<div class="divide-y rounded-lg overflow-hidden" style="border:1px solid var(--border)">';
                     a.prodotti_usati.forEach(p => {
-                        html += '<div class="flex justify-between px-4 py-2 bg-slate-50"><span>' + (p.id_prodotto?.nome || '-') + '</span><span class="font-medium">' + formatNumber(p.quantita_utilizzata) + ' ' + (p.id_prodotto?.unita_misura || '') + '</span></div>';
+                        html += '<div class="flex justify-between px-4 py-2" style="background:var(--surface-hover)"><span style="color:var(--text)">' + (p.id_prodotto?.nome || '-') + '</span><span class="font-medium" style="color:var(--text)">' + formatNumber(p.quantita_utilizzata) + ' ' + (p.id_prodotto?.unita_misura || '') + '</span></div>';
                     });
                     html += '</div>';
                 } else {
-                    html += '<p class="text-slate-400 italic mt-3">Nessun prodotto utilizzato</p>';
+                    html += '<p class="italic mt-3" style="color:var(--text-secondary)">Nessun prodotto utilizzato</p>';
                 }
 
                 document.getElementById('dettagli-content').innerHTML = html;
@@ -346,6 +403,57 @@
             } catch (error) {
                 showError(error.message);
             }
+        }
+
+        // Report PDF
+        function openReportModal() {
+            const y = new Date().getFullYear();
+            const selAnno = document.getElementById('report-anno');
+            selAnno.innerHTML = '';
+            for (let i = y; i >= y - 5; i--) {
+                const o = document.createElement('option');
+                o.value = i; o.textContent = i;
+                if (i === y) o.selected = true;
+                selAnno.appendChild(o);
+            }
+            const selMese = document.getElementById('report-mese');
+            selMese.innerHTML = '';
+            const nomiMesi = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+            nomiMesi.forEach((n, i) => {
+                const o = document.createElement('option');
+                o.value = i + 1; o.textContent = n;
+                if (i === new Date().getMonth()) o.selected = true;
+                selMese.appendChild(o);
+            });
+            toggleReportTipo();
+            openModal('modal-report');
+        }
+        function toggleReportTipo() {
+            const t = document.getElementById('report-tipo').value;
+            document.getElementById('report-anno-group').classList.toggle('hidden', false);
+            document.getElementById('report-mese-group').classList.toggle('hidden', t !== 'mensile');
+            document.getElementById('report-stagione-group').classList.toggle('hidden', t !== 'stagionale');
+        }
+        function scaricaPDF(e) {
+            e.preventDefault();
+            const tipo = document.getElementById('report-tipo').value;
+            const anno = document.getElementById('report-anno').value;
+            let query = `?anno=${anno}`;
+            if (tipo === 'mensile') query += `&mese=${document.getElementById('report-mese').value}`;
+            if (tipo === 'stagionale') query += `&stagione=${document.getElementById('report-stagione').value}`;
+            const token = getToken();
+            fetch(API_URL + '/report/pdf' + query, { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(r => { if (!r.ok) throw new Error('Errore'); return r.blob(); })
+                .then(blob => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = 'quaderno_' + anno + '.pdf';
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                    closeModal('modal-report');
+                    showSuccess('PDF scaricato');
+                })
+                .catch(err => showError('Errore download PDF'));
         }
     </script>
 </body>

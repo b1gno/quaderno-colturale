@@ -19,6 +19,7 @@
                     <li><a href="coltivazioni.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Coltivazioni</a></li>
                     <li><a href="prodotti.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Magazzino</a></li>
                     <li><a href="attivita.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Attività</a></li>
+                    <li><a href="calendario.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Calendario</a></li>
                 </ul>
             </div>
         </div>
@@ -75,6 +76,19 @@
             </div>
         </div>
 
+        <!-- Previsioni esaurimento -->
+        <div id="section-previsioni" class="rounded-xl shadow-sm p-6 mb-8 hidden" style="background:var(--surface)">
+            <h3 class="text-lg font-semibold mb-4" style="color:var(--text)">📈 Previsioni Esaurimento Scorte</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead><tr class="text-left font-semibold" style="background:var(--surface-hover);color:var(--text-secondary)">
+                        <th class="px-4 py-3">Prodotto</th><th class="px-4 py-3">Disponibile</th><th class="px-4 py-3">Consumo/giorno</th><th class="px-4 py-3">Fine prevista</th><th class="px-4 py-3">Stato</th>
+                    </tr></thead>
+                    <tbody id="table-previsioni" class="divide-y" style="border-color:var(--border)"></tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Ultime attività -->
         <div class="rounded-xl shadow-sm p-6" style="background:var(--surface)">
             <div class="flex items-center justify-between mb-4">
@@ -113,12 +127,31 @@
                     document.getElementById('table-sotto-scorta').innerHTML = ps.map(p =>
                         `<tr class="hover:bg-opacity-50 transition-colors" style="hover:background:var(--surface-hover)">
                             <td class="px-4 py-3 font-medium">${p.nome}</td>
-                            <td class="px-4 py-3" style="color:var(--text-secondary)">${p.categoria}</td>
+                            <td class="px-4 py-3" style="color:var(--text-secondary)">${p.categoria || '-'}</td>
                             <td class="px-4 py-3 font-bold" style="color:var(--danger)">${formatNumber(p.quantita_disponibile)}</td>
                             <td class="px-4 py-3">${formatNumber(p.scorta_minima)}</td>
                             <td class="px-4 py-3" style="color:var(--text-secondary)">${p.unita_misura}</td>
                         </tr>`
                     ).join('');
+                }
+
+                const previsioni = await apiGet('/magazzino/previsioni');
+                const critiche = previsioni.filter(p => p.giorni_rimanenti !== null && p.giorni_rimanenti <= 30 && !p.sotto_scorta);
+                if (critiche.length > 0) {
+                    document.getElementById('section-previsioni').classList.remove('hidden');
+                    document.getElementById('table-previsioni').innerHTML = critiche.map(p => {
+                        const g = p.giorni_rimanenti;
+                        const urgente = g <= 7;
+                        return `<tr class="hover:bg-opacity-50 transition-colors" style="hover:background:var(--surface-hover)">
+                            <td class="px-4 py-3 font-medium">${p.nome}</td>
+                            <td class="px-4 py-3">${formatNumber(p.quantita_disponibile)} ${p.unita_misura}</td>
+                            <td class="px-4 py-3">${formatNumber(p.consumo_giornaliero, 3)} ${p.unita_misura}</td>
+                            <td class="px-4 py-3 font-medium" ${urgente ? 'style="color:var(--danger)"' : ''}>${p.data_esaurimento || '?'} (${g}g)</td>
+                            <td class="px-4 py-3">${urgente
+                                ? '<span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full" style="background:var(--danger-light);color:var(--danger)">🔴 Urgente</span>'
+                                : '<span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full" style="background:#fef3c7;color:#d97706">🟡 Attento</span>'}</td>
+                        </tr>`;
+                    }).join('');
                 }
 
                 // Ultime attività

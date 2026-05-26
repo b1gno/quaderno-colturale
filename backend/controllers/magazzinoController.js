@@ -16,7 +16,80 @@ exports.getStatistiche = async (req, res) => {
   const totaleProdotti = prodotti.length;
   const prodottiSottoScorta = prodotti.filter(p => p.quantita_disponibile <= p.scorta_minima).length;
 
-  res.json({ totale_prodotti: totaleProdotti, prodotti_sotto_scorta: prodottiSottoScorta });
+  const novantaGiorniFa = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+  const scarichi = await MovimentoMagazzino.find({
+    ...userFilter(req),
+    tipo_movimento: 'scarico',
+    createdAt: { $gte: novantaGiorniFa }
+  });
+
+  const consumi = {};
+  scarichi.forEach(m => {
+    const id = String(m.id_prodotto);
+    consumi[id] = (consumi[id] || 0) + m.quantita;
+  });
+
+  const previsioni = prodotti.map(p => {
+    const id = String(p._id);
+    const totaleConsumato = consumi[id] || 0;
+    const consumoGiornaliero = totaleConsumato / 90;
+    let giorniRimanenti = null;
+    if (consumoGiornaliero > 0 && p.quantita_disponibile > 0) {
+      giorniRimanenti = Math.floor(p.quantita_disponibile / consumoGiornaliero);
+    }
+    return {
+      _id: p._id,
+      nome: p.nome,
+      unita_misura: p.unita_misura,
+      quantita_disponibile: p.quantita_disponibile,
+      scorta_minima: p.scorta_minima,
+      consumo_giornaliero: Math.round(consumoGiornaliero * 100) / 100,
+      giorni_rimanenti: giorniRimanenti,
+      sotto_scorta: p.quantita_disponibile <= p.scorta_minima
+    };
+  });
+
+  res.json({ totale_prodotti: totaleProdotti, prodotti_sotto_scorta: prodottiSottoScorta, previsioni });
+};
+
+exports.getPrevisioni = async (req, res) => {
+  const prodotti = await Prodotto.find(userFilter(req));
+  const novantaGiorniFa = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+  const scarichi = await MovimentoMagazzino.find({
+    ...userFilter(req),
+    tipo_movimento: 'scarico',
+    createdAt: { $gte: novantaGiorniFa }
+  });
+
+  const consumi = {};
+  scarichi.forEach(m => {
+    const id = String(m.id_prodotto);
+    consumi[id] = (consumi[id] || 0) + m.quantita;
+  });
+
+  const previsioni = prodotti.map(p => {
+    const id = String(p._id);
+    const totaleConsumato = consumi[id] || 0;
+    const consumoGiornaliero = totaleConsumato / 90;
+    let giorniRimanenti = null;
+    if (consumoGiornaliero > 0 && p.quantita_disponibile > 0) {
+      giorniRimanenti = Math.floor(p.quantita_disponibile / consumoGiornaliero);
+    }
+    return {
+      _id: p._id,
+      nome: p.nome,
+      unita_misura: p.unita_misura,
+      categoria: p.categoria,
+      quantita_disponibile: p.quantita_disponibile,
+      scorta_minima: p.scorta_minima,
+      consumo_giornaliero: Math.round(consumoGiornaliero * 100) / 100,
+      giorni_rimanenti: giorniRimanenti,
+      data_esaurimento: giorniRimanenti !== null ? new Date(Date.now() + giorniRimanenti * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : null,
+      sotto_scorta: p.quantita_disponibile <= p.scorta_minima
+    };
+  });
+
+  res.json(previsioni);
 };
 
 exports.carico = async (req, res) => {

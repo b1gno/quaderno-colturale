@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario - Quaderno di Campo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <nav class="bg-emerald-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl font-bold tracking-tight">🌾 Quaderno di Campo</h1>
+                <ul class="flex gap-1 items-center">
+                    <li><a href="index.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Dashboard</a></li>
+                    <li><a href="campi.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Campi</a></li>
+                    <li><a href="coltivazioni.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Coltivazioni</a></li>
+                    <li><a href="prodotti.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Magazzino</a></li>
+                    <li><a href="attivita.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 transition-colors">Attività</a></li>
+                    <li><a href="calendario.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-white/20">Calendario</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <h2 class="text-2xl font-bold" style="color:var(--primary)">📅 Calendario Attività</h2>
+        </div>
+
+        <div class="rounded-xl shadow-sm overflow-hidden" style="background:var(--surface)">
+            <div class="flex items-center justify-between p-4 border-b" style="border-color:var(--border)">
+                <button onclick="prevMonth()" class="px-4 py-2 text-sm font-medium rounded-lg transition-colors" style="background:var(--surface-hover);color:var(--text)">← Mese Prec.</button>
+                <h3 id="calendar-title" class="text-lg font-bold" style="color:var(--text)">Mese Anno</h3>
+                <button onclick="nextMonth()" class="px-4 py-2 text-sm font-medium rounded-lg transition-colors" style="background:var(--surface-hover);color:var(--text)">Mese Succ. →</button>
+            </div>
+            <div class="p-4">
+                <div class="calendar-grid text-center">
+                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Lun</div>
+                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Mar</div>
+                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Mer</div>
+                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Gio</div>
+                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Ven</div>
+                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Sab</div>
+                    <div class="font-semibold text-sm py-2" style="color:var(--text-secondary)">Dom</div>
+                </div>
+                <div id="calendar-grid" class="calendar-grid mt-1"></div>
+            </div>
+        </div>
+
+        <div class="rounded-xl shadow-sm p-4 mt-6" style="background:var(--surface)">
+            <div class="flex items-center justify-between mb-3">
+                <h4 class="text-sm font-semibold" style="color:var(--text)">📋 Attività del <span id="selected-date-label">seleziona un giorno</span></h4>
+                <button onclick="openQuickAdd()" class="text-sm font-medium px-3 py-1.5 rounded-lg text-white shadow-sm transition-colors" style="background:var(--primary)" id="btn-quick-add" disabled>+ Aggiungi</button>
+            </div>
+            <div id="day-events" class="text-sm italic" style="color:var(--text-secondary)">Clicca un giorno per vedere le attività</div>
+        </div>
+    </main>
+
+    <!-- Modal Quick Add -->
+    <div id="modal-quick-add" class="modal">
+        <div class="modal-content rounded-xl shadow-2xl p-6" style="background:var(--surface)">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold" style="color:var(--text)">Nuova Attività per <span id="quick-add-date"></span></h3>
+                <button class="text-2xl leading-none transition-colors" style="color:var(--text-secondary)" onclick="closeModal('modal-quick-add')">&times;</button>
+            </div>
+            <form id="form-quick-add" onsubmit="saveQuickAdd(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1" style="color:var(--text)">Campo *</label>
+                    <select id="qa-campo" required class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1" style="color:var(--text)">Tipo Attività</label>
+                    <select id="qa-tipo" class="w-full px-3 py-2 rounded-lg outline-none" style="background:var(--bg);color:var(--text);border:1px solid var(--border)">
+                        <option value="">Seleziona...</option>
+                        <option value="Preparazione terreno">Preparazione terreno</option>
+                        <option value="Semina">Semina</option>
+                        <option value="Trapianto">Trapianto</option>
+                        <option value="Concimazione">Concimazione</option>
+                        <option value="Trattamento fitosanitario">Trattamento fitosanitario</option>
+                        <option value="Diserbo">Diserbo</option>
+                        <option value="Irrigazione">Irrigazione</option>
+                        <option value="Raccolta">Raccolta</option>
+                        <option value="Altro">Altro</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1" style="color:var(--text)">Descrizione</label>
+                    <textarea id="qa-descrizione" rows="2" class="w-full px-3 py-2 rounded-lg outline-none resize-y" style="background:var(--bg);color:var(--text);border:1px solid var(--border)"></textarea>
+                </div>
+                <div class="flex gap-3 justify-end">
+                    <button type="button" class="px-4 py-2 text-sm font-medium rounded-lg transition-colors" style="background:var(--surface-hover);color:var(--text)" onclick="closeModal('modal-quick-add')">Annulla</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm" style="background:var(--primary)">Salva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Sposta -->
+    <div id="modal-sposta" class="modal">
+        <div class="modal-content rounded-xl shadow-2xl p-6" style="background:var(--surface); max-width: 400px;">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold" style="color:var(--text)">Sposta Attività</h3>
+                <button class="text-2xl leading-none transition-colors" style="color:var(--text-secondary)" onclick="closeModal('modal-sposta')">&times;</button>
+            </div>
+            <p class="text-sm mb-4" style="color:var(--text-secondary)">Spostare questa attività al <strong id="sposta-target-date"></strong>?</p>
+            <p id="sposta-desc" class="text-sm mb-4" style="color:var(--text)"></p>
+            <div class="flex gap-3 justify-end">
+                <button type="button" class="px-4 py-2 text-sm font-medium rounded-lg" style="background:var(--surface-hover);color:var(--text)" onclick="closeModal('modal-sposta')">Annulla</button>
+                <button type="button" class="px-4 py-2 text-sm font-medium text-white rounded-lg shadow-sm" style="background:var(--primary)" onclick="confirmSposta()">Sposta</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        let currentDate = new Date();
+        let selectedDate = null;
+        let allEvents = [];
+        let campi = [];
+        let spostaData = null;
+
+        const MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+        const DAYS = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+
+        async function loadCampi() {
+            try { campi = await apiGet('/campi'); } catch(e) { console.error(e); }
+        }
+
+        async function loadEvents() {
+            try {
+                allEvents = await apiGet('/attivita');
+                renderCalendar();
+            } catch(e) { console.error(e); }
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            document.getElementById('calendar-title').textContent = `${MONTHS[month]} ${year}`;
+
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            const firstDay = new Date(year, month, 1);
+            const startOffset = (firstDay.getDay() + 6) % 7; // lun=0
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrev = new Date(year, month, 0).getDate();
+            const today = new Date();
+
+            // Days from previous month
+            for (let i = startOffset - 1; i >= 0; i--) {
+                const d = daysInPrev - i;
+                grid.appendChild(createDayCell(year, month - 1, d, true));
+            }
+
+            // Current month days
+            for (let d = 1; d <= daysInMonth; d++) {
+                const isToday = year === today.getFullYear() && month === today.getMonth() && d === today.getDate();
+                grid.appendChild(createDayCell(year, month, d, false, isToday));
+            }
+
+            // Remaining cells to fill last week
+            const totalCells = startOffset + daysInMonth;
+            const remaining = (7 - (totalCells % 7)) % 7;
+            for (let d = 1; d <= remaining; d++) {
+                grid.appendChild(createDayCell(year, month + 1, d, true));
+            }
+        }
+
+        function createDayCell(year, month, day, otherMonth, isToday) {
+            const div = document.createElement('div');
+            div.className = 'calendar-day' + (otherMonth ? ' other-month' : '') + (isToday ? ' today' : '');
+
+            const dateStr = fmtISO(year, month, day);
+
+            const events = allEvents.filter(e => {
+                if (!e.data) return false;
+                const ed = new Date(e.data);
+                return ed.getFullYear() === year && ed.getMonth() === month && ed.getDate() === day;
+            });
+
+            if (events.length > 0) div.classList.add('has-event');
+
+            // Day number
+            const span = document.createElement('span');
+            span.textContent = day;
+            div.appendChild(span);
+
+            // Dots
+            if (events.length > 0) {
+                const dots = document.createElement('div');
+                dots.style.display = 'flex';
+                dots.style.gap = '2px';
+                dots.style.justifyContent = 'center';
+                dots.style.marginTop = '2px';
+                const maxDots = Math.min(events.length, 3);
+                for (let i = 0; i < maxDots; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'calendar-dot';
+                    dots.appendChild(dot);
+                }
+                if (events.length > 3) {
+                    const more = document.createElement('span');
+                    more.style.fontSize = '0.6rem';
+                    more.textContent = '+' + (events.length - 3);
+                    more.style.color = 'var(--text-secondary)';
+                    dots.appendChild(more);
+                }
+                div.appendChild(dots);
+            }
+
+            // Click to show events
+            div.addEventListener('click', () => selectDay(dateStr));
+
+            // Drop target
+            div.addEventListener('dragover', (e) => { e.preventDefault(); div.style.background = 'var(--surface-hover)'; });
+            div.addEventListener('dragleave', () => { div.style.background = ''; });
+            div.addEventListener('drop', (e) => {
+                e.preventDefault();
+                div.style.background = '';
+                const id = e.dataTransfer.getData('text/plain');
+                if (id) {
+                    const ev = allEvents.find(x => x._id === id);
+                    if (ev) {
+                        spostaData = { id, newDate: dateStr };
+                        document.getElementById('sposta-target-date').textContent = formatDate(dateStr);
+                        document.getElementById('sposta-desc').textContent = (ev.tipo_attivita || 'Attività') + ' — ' + (ev.id_campo?.nome || '');
+                        openModal('modal-sposta');
+                    }
+                }
+            });
+
+            return div;
+        }
+
+        function selectDay(dateStr) {
+            selectedDate = dateStr;
+            document.getElementById('selected-date-label').textContent = formatDate(dateStr);
+            document.getElementById('btn-quick-add').disabled = false;
+
+            const container = document.getElementById('day-events');
+            const events = allEvents.filter(e => {
+                if (!e.data) return false;
+                const ed = new Date(e.data);
+                return fmtISO(ed.getFullYear(), ed.getMonth(), ed.getDate()) === dateStr;
+            });
+
+            if (!events.length) {
+                container.innerHTML = '<span class="italic" style="color:var(--text-secondary)">Nessuna attività in questo giorno</span>';
+                return;
+            }
+
+            container.innerHTML = '';
+            events.forEach(e => {
+                const card = document.createElement('div');
+                card.draggable = true;
+                card.className = 'flex items-center justify-between p-3 rounded-lg mb-2 transition-colors';
+                card.style.background = 'var(--surface-hover)';
+                card.style.cursor = 'grab';
+                card.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-medium px-2 py-0.5 rounded-full" style="background:var(--primary-light);color:var(--primary)">${e.tipo_attivita || 'Generico'}</span>
+                            <span class="text-sm font-medium truncate" style="color:var(--text)">${e.id_campo?.nome || '-'}</span>
+                        </div>
+                        ${e.descrizione ? '<p class="text-xs mt-1 truncate" style="color:var(--text-secondary)">' + e.descrizione + '</p>' : ''}
+                    </div>
+                    <button class="text-sm font-medium ml-2 hover:underline" style="color:var(--danger);flex-shrink:0" onclick="deleteFromCalendar(\'${e._id}\', event)">✕</button>
+                `;
+                card.addEventListener('dragstart', (ev) => {
+                    ev.dataTransfer.setData('text/plain', e._id);
+                    card.style.opacity = '0.4';
+                });
+                card.addEventListener('dragend', () => { card.style.opacity = '1'; });
+                container.appendChild(card);
+            });
+        }
+
+        async function confirmSposta() {
+            try {
+                await apiPut('/attivita/' + spostaData.id, { data: spostaData.newDate });
+                showSuccess('Attività spostata al ' + formatDate(spostaData.newDate));
+                closeModal('modal-sposta');
+                loadEvents();
+                selectDay(selectedDate);
+            } catch(e) { showError(e.message); }
+        }
+
+        async function deleteFromCalendar(id, event) {
+            event.stopPropagation();
+            if (!confirmAction('Eliminare questa attività?')) return;
+            try { await apiDelete('/attivita/' + id); showSuccess('Eliminata'); loadEvents(); if (selectedDate) selectDay(selectedDate); } catch(e) { showError(e.message); }
+        }
+
+        function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
+        function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }
+
+        function openQuickAdd() {
+            if (!selectedDate) return;
+            document.getElementById('quick-add-date').textContent = formatDate(selectedDate);
+            document.getElementById('form-quick-add').reset();
+            document.getElementById('qa-tipo').value = '';
+            document.getElementById('qa-descrizione').value = '';
+            populateSelect('qa-campo', campi, '_id', 'nome');
+            openModal('modal-quick-add');
+        }
+
+        async function saveQuickAdd(e) {
+            e.preventDefault();
+            const data = {
+                data: selectedDate,
+                id_campo: document.getElementById('qa-campo').value,
+                tipo_attivita: document.getElementById('qa-tipo').value || null,
+                descrizione: document.getElementById('qa-descrizione').value || null
+            };
+            try { await apiPost('/attivita', data); showSuccess('Attività creata'); closeModal('modal-quick-add'); loadEvents(); if (selectedDate) selectDay(selectedDate); } catch(e) { showError(e.message); }
+        }
+
+        function fmtISO(year, month, day) {
+            return year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadCampi();
+            await loadEvents();
+        });
+    </script>
+</body>
+</html>

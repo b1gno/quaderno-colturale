@@ -17,6 +17,7 @@ app.use('/api/coltivazioni', require('./routes/coltivazioni'));
 app.use('/api/prodotti', require('./routes/prodotti'));
 app.use('/api/attivita', require('./routes/attivita'));
 app.use('/api/magazzino', require('./routes/magazzino'));
+app.use('/api/report', require('./routes/report'));
 
 app.get('/api/test', (req, res) => res.json({ message: 'API OK', timestamp: new Date() }));
 

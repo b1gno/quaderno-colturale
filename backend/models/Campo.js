@@ -5,6 +5,8 @@ const campoSchema = new mongoose.Schema({
   nome:         { type: String, required: [true, 'Il nome è obbligatorio'], trim: true },
   superficie:   { type: Number, min: 0 },
   tipo_terreno: { type: String, enum: ['Argilloso','Sabbioso','Medio impasto','Limoso','Franco', null] },
+  latitudine:   { type: Number },
+  longitudine:  { type: Number },
   note:         String,
 }, { timestamps: true });
 

@@ -8,6 +8,7 @@ router.use(auth);
 
 router.get('/movimenti',   wrap(ctrl.getMovimenti));
 router.get('/statistiche', wrap(ctrl.getStatistiche));
+router.get('/previsioni',  wrap(ctrl.getPrevisioni));
 router.post('/carico',  validateCarico, wrap(ctrl.carico));
 router.post('/scarico',                 wrap(ctrl.scarico));
 
